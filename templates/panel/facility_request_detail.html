@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ item.facility_name }} | 施設登録申請{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h4 fw-bold mb-0">{{ item.facility_name }}</h1>
+  <a href="{% url 'panel_facility_requests' %}" class="btn btn-sm btn-outline-secondary">一覧へ戻る</a>
+</div>
+
+{% if messages %}
+  {% for msg in messages %}
+    <div class="alert alert-{{ msg.tags }}">{{ msg }}</div>
+  {% endfor %}
+{% endif %}
+
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card mb-3">
+      <div class="card-header fw-bold">施設情報</div>
+      <div class="card-body">
+        <dl class="row mb-0 small">
+          <dt class="col-5">施設名</dt><dd class="col-7">{{ item.facility_name }}</dd>
+          <dt class="col-5">都道府県</dt><dd class="col-7">{{ item.prefecture }}</dd>
+          <dt class="col-5">住所</dt><dd class="col-7">{{ item.address|default:"-" }}</dd>
+          <dt class="col-5">種別</dt><dd class="col-7">{{ item.get_facility_type_display }}</dd>
+          <dt class="col-5">申請者</dt><dd class="col-7">{{ item.user.email|default:"-" }}</dd>
+          <dt class="col-5">申請日</dt><dd class="col-7">{{ item.created_at|date:"Y/m/d H:i" }}</dd>
+          <dt class="col-5">ステータス</dt><dd class="col-7">{{ item.get_status_display }}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card mb-3">
+      <div class="card-header fw-bold">評価</div>
+      <div class="card-body small">
+        <dl class="row mb-0">
+          <dt class="col-6">総合評価</dt><dd class="col-6">{{ item.overall_rating|default:"-" }}</dd>
+          <dt class="col-6">給与</dt><dd class="col-6">{{ item.salary_rating|default:"-" }}</dd>
+          <dt class="col-6">人間関係</dt><dd class="col-6">{{ item.relationship_rating|default:"-" }}</dd>
+          <dt class="col-6">教育体制</dt><dd class="col-6">{{ item.education_rating|default:"-" }}</dd>
+          <dt class="col-6">設備・機器</dt><dd class="col-6">{{ item.equipment_rating|default:"-" }}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card mb-3">
+      <div class="card-header fw-bold">職場データ</div>
+      <div class="card-body small">
+        <div class="row">
+          <dl class="col-md-6 row mb-0">
+            <dt class="col-6">年収</dt><dd class="col-6">{{ item.annual_salary|default:"-" }}{% if item.annual_salary %}万円{% endif %}</dd>
+            <dt class="col-6">月残業</dt><dd class="col-6">{{ item.overtime_hours|default:"-" }}{% if item.overtime_hours %}時間{% endif %}</dd>
+            <dt class="col-6">有給取得率</dt><dd class="col-6">{{ item.paid_leave_rate|default:"-" }}{% if item.paid_leave_rate %}%{% endif %}</dd>
+            <dt class="col-6">技師数</dt><dd class="col-6">{{ item.technician_count|default:"-" }}{% if item.technician_count %}人{% endif %}</dd>
+            <dt class="col-6">雇用形態</dt><dd class="col-6">{{ item.employment_type|default:"-" }}</dd>
+            <dt class="col-6">平均年齢</dt><dd class="col-6">{{ item.average_age|default:"-" }}{% if item.average_age %}歳{% endif %}</dd>
+          </dl>
+          <dl class="col-md-6 row mb-0">
+            <dt class="col-6">オンコール</dt><dd class="col-6">{% if item.has_oncall %}あり{% else %}なし{% endif %}</dd>
+            <dt class="col-6">当直</dt><dd class="col-6">{% if item.has_night_duty %}あり{% else %}なし{% endif %}</dd>
+            <dt class="col-6">夜勤</dt><dd class="col-6">{% if item.has_night_shift %}あり{% else %}なし{% endif %}</dd>
+            <dt class="col-6">採血行為</dt><dd class="col-6">{% if item.has_blood_sampling is None %}-{% elif item.has_blood_sampling %}あり{% else %}なし{% endif %}</dd>
+            <dt class="col-6">業務スタイル</dt><dd class="col-6">{{ item.work_style|default:"-" }}</dd>
+            <dt class="col-6">オンコール頻度</dt><dd class="col-6">{{ item.oncall_night_frequency|default:"-" }}</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if item.good_points %}
+  <div class="col-md-6">
+    <div class="card mb-3">
+      <div class="card-header fw-bold">良かった点</div>
+      <div class="card-body small">{{ item.good_points }}</div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if item.concerns %}
+  <div class="col-md-6">
+    <div class="card mb-3">
+      <div class="card-header fw-bold">気になった点</div>
+      <div class="card-body small">{{ item.concerns }}</div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if item.suitable_for %}
+  <div class="col-md-6">
+    <div class="card mb-3">
+      <div class="card-header fw-bold">向いている人</div>
+      <div class="card-body small">{{ item.suitable_for }}</div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if item.joining_gap %}
+  <div class="col-md-6">
+    <div class="card mb-3">
+      <div class="card-header fw-bold">入職後のギャップ</div>
+      <div class="card-body small">{{ item.joining_gap }}</div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+{% if item.status == 'pending' or item.status == 'needs_review' %}
+<div class="d-flex gap-2 mt-2">
+  <form method="post" action="{% url 'panel_facility_request_action' item.pk %}">
+    {% csrf_token %}<input type="hidden" name="action" value="approve">
+    <button class="btn btn-success">承認して施設を登録</button>
+  </form>
+  <form method="post" action="{% url 'panel_facility_request_action' item.pk %}">
+    {% csrf_token %}<input type="hidden" name="action" value="needs_review">
+    <button class="btn btn-outline-info">要確認にする</button>
+  </form>
+  <form method="post" action="{% url 'panel_facility_request_action' item.pk %}">
+    {% csrf_token %}<input type="hidden" name="action" value="reject">
+    <button class="btn btn-outline-danger">却下する</button>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

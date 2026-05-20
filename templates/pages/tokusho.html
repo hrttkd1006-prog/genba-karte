@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}特定商取引法に基づく表記 | げんばカルテ{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <h1 class="h4 fw-bold mb-4">特定商取引法に基づく表記</h1>
+    <div class="card">
+      <div class="card-body">
+        <table class="table table-bordered small">
+          <tbody>
+            <tr><th class="bg-light w-35" style="width:35%">販売事業者</th><td>（運営者名を記入）</td></tr>
+            <tr><th class="bg-light">代表者名</th><td>（代表者名を記入）</td></tr>
+            <tr><th class="bg-light">所在地</th><td>請求があった場合、遅滞なく開示します</td></tr>
+            <tr><th class="bg-light">電話番号</th><td>請求があった場合、遅滞なく開示します</td></tr>
+            <tr><th class="bg-light">メールアドレス</th><td>お問い合わせページよりご連絡ください</td></tr>
+            <tr><th class="bg-light">サービス名</th><td>げんばカルテ</td></tr>
+            <tr><th class="bg-light">販売価格</th><td>月額 3,000円（税別）／年額 30,000円（税別）</td></tr>
+            <tr><th class="bg-light">支払方法</th><td>クレジットカード（Stripe決済）</td></tr>
+            <tr><th class="bg-light">支払時期</th><td>契約時および各更新日に自動課金</td></tr>
+            <tr><th class="bg-light">サービス提供時期</th><td>決済完了後、即時</td></tr>
+            <tr><th class="bg-light">キャンセル・返金</th><td>月途中のキャンセルによる日割り返金はいたしません。次回更新日までサービスをご利用いただけます。</td></tr>
+            <tr><th class="bg-light">動作環境</th><td>最新バージョンの主要ブラウザ（Chrome / Firefox / Safari / Edge）</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

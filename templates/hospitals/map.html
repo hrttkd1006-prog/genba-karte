@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}地図で探す | げんばカルテ{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+<style>
+  #map { height: 560px; border-radius: var(--radius); box-shadow: var(--shadow); }
+  .leaflet-popup-content { font-family: 'Noto Sans JP', sans-serif; font-size: .85rem; line-height: 1.6; }
+  /* クラスターの色をサイトカラーに合わせる */
+  .marker-cluster-small  { background: rgba(74,134,216,.3); }
+  .marker-cluster-small div  { background: rgba(74,134,216,.7); color:#fff; font-weight:700; }
+  .marker-cluster-medium { background: rgba(124,104,238,.3); }
+  .marker-cluster-medium div { background: rgba(124,104,238,.7); color:#fff; font-weight:700; }
+  .marker-cluster-large  { background: rgba(74,134,216,.2); }
+  .marker-cluster-large div  { background: rgba(74,134,216,.9); color:#fff; font-weight:700; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div>
+    <h1 class="h4 fw-bold mb-0"><i class="bi bi-map text-primary"></i> 地図で探す</h1>
+    <p class="text-muted small mb-0 mt-1">
+      マーカーをクリックすると施設の詳細を確認できます
+      <span class="ms-2 badge bg-light text-muted border">{{ geocoded }}/{{ total }}件 座標取得済み</span>
+    </p>
+  </div>
+  <a href="{% url 'hospital_list' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-list"></i> 一覧で見る
+  </a>
+</div>
+
+<div id="map" class="mb-3"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script>
+const map = L.map('map').setView([36.5, 137.0], 5);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  maxZoom: 16,
+}).addTo(map);
+
+// クラスターグループ
+const cluster = L.markerClusterGroup({
+  maxClusterRadius: 50,
+  showCoverageOnHover: false,
+});
+
+// 個別病院マーカー
+const hospitals = [
+  {% for h in hospitals %}
+  {
+    pk: {{ h.pk }},
+    name: "{{ h.name|escapejs }}",
+    prefecture: "{{ h.prefecture|escapejs }}",
+    facility_type: "{{ h.get_facility_type_display|escapejs }}",
+    review_count: {{ h.review_count }},
+    avg_rating: {% if h.avg_rating %}{{ h.avg_rating|floatformat:1 }}{% else %}null{% endif %},
+    lat: {{ h.lat }},
+    lng: {{ h.lng }},
+  },
+  {% endfor %}
+];
+
+hospitals.forEach(h => {
+  const color = h.review_count > 5 ? '#4A86D8' : h.review_count > 0 ? '#7C68EE' : '#94A3B8';
+  const icon = L.divIcon({
+    html: `<div style="
+      background:${color}; border:2px solid #fff;
+      border-radius:50%; width:14px; height:14px;
+      box-shadow:0 2px 5px rgba(0,0,0,.35);
+    "></div>`,
+    className: '',
+    iconSize: [14, 14],
+    iconAnchor: [7, 7],
+  });
+  const marker = L.marker([h.lat, h.lng], { icon });
+  marker.bindPopup(`
+    <strong>${h.name}</strong><br>
+    <span style="color:#64748B">${h.prefecture} · ${h.facility_type}</span><br>
+    ${h.avg_rating ? `⭐ ${h.avg_rating} · ` : ''}口コミ ${h.review_count}件<br>
+    <a href="/hospitals/${h.pk}/" style="color:#4A86D8; font-weight:600;">詳細・口コミを見る →</a>
+  `);
+  cluster.addLayer(marker);
+});
+
+// 座標なし施設の都道府県マーカー
+const prefCenters = {
+  "北海道":[43.06,141.35],"青森県":[40.82,140.74],"岩手県":[39.70,141.15],"宮城県":[38.27,140.87],
+  "秋田県":[39.72,140.10],"山形県":[38.24,140.36],"福島県":[37.75,140.47],"茨城県":[36.34,140.45],
+  "栃木県":[36.57,139.88],"群馬県":[36.39,139.06],"埼玉県":[35.86,139.65],"千葉県":[35.60,140.12],
+  "東京都":[35.69,139.69],"神奈川県":[35.45,139.64],"新潟県":[37.90,139.02],"富山県":[36.70,137.21],
+  "石川県":[36.59,136.63],"福井県":[36.07,136.22],"山梨県":[35.66,138.57],"長野県":[36.65,138.18],
+  "岐阜県":[35.39,136.72],"静岡県":[34.98,138.38],"愛知県":[35.18,136.91],"三重県":[34.73,136.51],
+  "滋賀県":[35.00,135.87],"京都府":[35.02,135.76],"大阪府":[34.69,135.50],"兵庫県":[34.69,135.18],
+  "奈良県":[34.68,135.83],"和歌山県":[34.23,135.17],"鳥取県":[35.50,134.24],"島根県":[35.47,133.05],
+  "岡山県":[34.66,133.93],"広島県":[34.40,132.46],"山口県":[34.19,131.47],"徳島県":[34.07,134.56],
+  "香川県":[34.34,134.04],"愛媛県":[33.84,132.77],"高知県":[33.56,133.53],"福岡県":[33.61,130.42],
+  "佐賀県":[33.25,130.30],"長崎県":[32.74,129.87],"熊本県":[32.79,130.74],"大分県":[33.24,131.61],
+  "宮崎県":[31.91,131.42],"鹿児島県":[31.56,130.56],"沖縄県":[26.21,127.68]
+};
+
+{% for pref, count in no_coord_prefectures.items %}
+(function() {
+  const c = prefCenters["{{ pref }}"];
+  if (!c) return;
+  const icon = L.divIcon({
+    html: `<div style="
+      background:#F59E0B; color:#fff; border-radius:6px;
+      width:32px; height:22px; display:flex; align-items:center;
+      justify-content:center; font-size:11px; font-weight:700;
+      box-shadow:0 2px 5px rgba(0,0,0,.2);
+    ">+{{ count }}</div>`,
+    className: '', iconSize:[32,22], iconAnchor:[16,11],
+  });
+  const marker = L.marker(c, { icon });
+  marker.bindPopup(
+    `<strong>{{ pref }}</strong><br>座標未取得: {{ count }}件<br>` +
+    `<a href="/hospitals/?prefecture={{ pref }}" style="color:#4A86D8; font-weight:600;">一覧を見る →</a>`
+  );
+  cluster.addLayer(marker);
+})();
+{% endfor %}
+
+map.addLayer(cluster);
+</script>
+
+<div class="d-flex gap-3 flex-wrap small text-muted mt-1">
+  <span><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#4A86D8;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.2);" class="me-1"></span>口コミ6件以上</span>
+  <span><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#7C68EE;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.2);" class="me-1"></span>口コミあり</span>
+  <span><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#94A3B8;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.2);" class="me-1"></span>口コミなし</span>
+  <span><span style="display:inline-block;width:32px;height:12px;border-radius:3px;background:#F59E0B;text-align:center;font-size:9px;color:#fff;line-height:12px;" class="me-1">+n</span>座標未取得（都道府県単位）</span>
+</div>
+{% endblock %}

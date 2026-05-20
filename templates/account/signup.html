@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}無料会員登録 | げんばカルテ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-sm-8 col-md-5">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h1 class="h4 fw-bold text-center mb-1">無料会員登録</h1>
+        <p class="text-center text-muted small mb-4">メールアドレスだけで登録できます</p>
+        <form method="post">
+          {% csrf_token %}
+          {{ form|crispy }}
+          <div class="d-grid mt-3">
+            <button type="submit" class="btn btn-primary btn-lg">登録する（無料）</button>
+          </div>
+        </form>
+        <p class="text-muted small text-center mt-3 mb-0">
+          登録することで<a href="{% url 'terms' %}">利用規約</a>・
+          <a href="{% url 'privacy' %}">プライバシーポリシー</a>に同意したものとみなします。
+        </p>
+        <hr>
+        <p class="text-center small text-muted mb-0">
+          すでにアカウントをお持ちの方は
+          <a href="{% url 'account_login' %}">ログイン</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

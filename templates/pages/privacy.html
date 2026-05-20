@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}プライバシーポリシー | げんばカルテ{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <h1 class="h4 fw-bold mb-4">プライバシーポリシー</h1>
+    <div class="card">
+      <div class="card-body">
+        <p class="text-muted small">最終更新日：2025年1月1日</p>
+
+        <h2 class="h6 fw-bold mt-3">収集する情報</h2>
+        <ul class="small">
+          <li>メールアドレス（会員登録時）</li>
+          <li>勤務先・学校名（任意入力）</li>
+          <li>投稿したレビュー内容</li>
+          <li>IPアドレス（不正投稿対策のみ）</li>
+          <li>Cookie・アクセスログ</li>
+        </ul>
+
+        <h2 class="h6 fw-bold mt-4">利用目的</h2>
+        <ul class="small">
+          <li>サービスの提供・運営</li>
+          <li>異議申し立て対応（投稿者への確認メール送信）</li>
+          <li>不正利用の防止</li>
+          <li>サービス改善のための統計分析</li>
+        </ul>
+
+        <h2 class="h6 fw-bold mt-4">第三者提供</h2>
+        <p class="small">法令に基づく場合を除き、ユーザーの個人情報を第三者へ提供しません。メールアドレスは異議申し立て対応以外の目的には使用しません。</p>
+
+        <h2 class="h6 fw-bold mt-4">Cookie</h2>
+        <p class="small">当サービスはCookieを使用してログイン状態の維持・利便性向上を行います。ブラウザ設定でCookieを無効にすることができますが、一部機能が利用できなくなる場合があります。</p>
+
+        <h2 class="h6 fw-bold mt-4">お問い合わせ</h2>
+        <p class="small">個人情報の取り扱いに関するお問い合わせは<a href="{% url 'contact' %}">お問い合わせページ</a>よりご連絡ください。</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

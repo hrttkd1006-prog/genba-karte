@@ -1,0 +1,356 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ hospital.name }} の口コミ・評判 | げんばカルテ{% endblock %}
+{% block meta_description %}{{ hospital.name }}（{{ hospital.prefecture }}）で働く臨床検査技師のリアルな口コミ・年収・残業・評価情報。{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ hospital.name }} の口コミ・評判 | げんばカルテ{% endblock %}
+{% block og_description %}{{ hospital.name }}（{{ hospital.prefecture }}）のレビュー{{ review_count }}件。年収・残業・教育体制など臨床検査技師のリアルな声。{% endblock %}
+{% block tw_title %}{{ hospital.name }} の口コミ | げんばカルテ{% endblock %}
+{% block tw_description %}{{ hospital.prefecture }} · レビュー{{ review_count }}件{% if avg_rating %} · 総合評価{{ avg_rating }}{% endif %}{% endblock %}
+
+{% block content %}
+<!-- 病院ヘッダー -->
+<div class="card mb-4 border-0 shadow-sm">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+      <div>
+        <span class="badge bg-primary-subtle text-primary mb-1">{{ hospital.get_facility_type_display }}</span>
+        <h1 class="h3 fw-bold mb-1">{{ hospital.name }}</h1>
+        <p class="text-muted mb-1"><i class="bi bi-geo-alt"></i> {{ hospital.prefecture }} {{ hospital.address }}</p>
+        {% if hospital.phone %}
+          <p class="text-muted small mb-1"><i class="bi bi-telephone"></i> {{ hospital.phone }}</p>
+        {% endif %}
+        <div class="d-flex gap-3 flex-wrap small text-muted">
+          {% if hospital.beds %}<span><i class="bi bi-hospital"></i> {{ hospital.beds }}床</span>{% endif %}
+          {% if hospital.technician_count %}<span><i class="bi bi-people"></i> 技師 約{{ hospital.technician_count }}名</span>{% endif %}
+          {% if hospital.website %}
+            <a href="{{ hospital.website }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+              <i class="bi bi-globe"></i> 公式サイト
+            </a>
+          {% endif %}
+        </div>
+      </div>
+      <div class="text-center">
+        {% if avg_rating %}
+          <div class="display-4 fw-bold text-warning lh-1">{{ avg_rating }}</div>
+          <div class="text-muted small">/ 5.0</div>
+          <div class="text-muted small">{{ review_count }}件のレビュー</div>
+        {% else %}
+          <div class="text-muted small">まだレビューがありません</div>
+        {% endif %}
+        {% if user.is_authenticated %}
+          <form action="{% url 'toggle_favorite' hospital.pk %}" method="post" class="mt-2">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm {% if is_favorite %}btn-warning{% else %}btn-outline-secondary{% endif %}">
+              <i class="bi bi-heart{% if is_favorite %}-fill{% endif %}"></i>
+              {% if is_favorite %}お気に入り済み{% else %}お気に入り{% endif %}
+            </button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if hospital.get_departments_list %}
+    <hr class="my-2">
+    <div class="small">
+      <strong>診療科目：</strong>
+      {% for dept in hospital.get_departments_list %}
+        <span class="badge bg-light text-dark border me-1">{{ dept }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if hospital.get_inspection_items_list %}
+    <div class="small mt-1">
+      <strong>検査項目：</strong>
+      {% for item in hospital.get_inspection_items_list %}
+        <span class="badge bg-light text-dark border me-1">{{ item }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <hr class="my-2">
+    <p class="text-muted mb-0" style="font-size:.75rem;">
+      <i class="bi bi-info-circle"></i>
+      施設情報（病床数・診療科目など）は公開情報をもとに登録していますが、実際と異なる場合があります。
+      口コミ投稿や施設からのご連絡をもとに順次更新しています。
+      <a href="{% url 'contact' %}" class="text-muted">情報の修正はこちら</a>
+    </p>
+  </div>
+</div>
+
+<!-- 集計サマリー -->
+{% if review_count > 0 %}
+<div class="row g-3 mb-4">
+  {% if avg_salary %}
+  <div class="col-4">
+    <div class="card border-0 bg-white shadow-sm text-center p-3">
+      <div class="fs-4 fw-bold text-primary">{{ avg_salary }}<small class="fs-6">万円</small></div>
+      <div class="text-muted small">平均年収</div>
+    </div>
+  </div>
+  {% endif %}
+  {% if avg_overtime %}
+  <div class="col-4">
+    <div class="card border-0 bg-white shadow-sm text-center p-3">
+      <div class="fs-4 fw-bold text-primary">{{ avg_overtime }}<small class="fs-6">h</small></div>
+      <div class="text-muted small">月平均残業</div>
+    </div>
+  </div>
+  {% endif %}
+  <div class="col-4">
+    <div class="card border-0 bg-white shadow-sm text-center p-3">
+      <div class="fs-4 fw-bold text-primary">{{ review_count }}</div>
+      <div class="text-muted small">口コミ数</div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="row g-4">
+  <div class="col-lg-8">
+
+    <!-- レビュー投稿ボタン＋ソート -->
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h2 class="h5 fw-bold mb-0"><i class="bi bi-chat-square-text text-primary"></i> 口コミ・レビュー</h2>
+      {% if user.is_authenticated %}
+        <a href="{% url 'review_create' hospital.pk %}" class="btn btn-primary btn-sm">
+          <i class="bi bi-pencil-square"></i> レビューを書く
+        </a>
+      {% else %}
+        <a href="{% url 'account_signup' %}" class="btn btn-outline-primary btn-sm">
+          登録してレビューを書く
+        </a>
+      {% endif %}
+    </div>
+    {% if review_count > 0 %}
+    <div class="mb-3 d-flex gap-1 small">
+      <a href="?sort=newest" class="btn btn-sm {% if sort == 'newest' %}btn-primary{% else %}btn-outline-secondary{% endif %}">新着順</a>
+      <a href="?sort=rating_high" class="btn btn-sm {% if sort == 'rating_high' %}btn-primary{% else %}btn-outline-secondary{% endif %}">評価が高い順</a>
+      <a href="?sort=rating_low" class="btn btn-sm {% if sort == 'rating_low' %}btn-primary{% else %}btn-outline-secondary{% endif %}">評価が低い順</a>
+    </div>
+    {% endif %}
+
+    {% for review in reviews %}
+    {% if user.is_authenticated or forloop.first %}
+    <div class="card review-card mb-3">
+      <div class="card-body">
+        <!-- 鮮度ラベル -->
+        {% with review.get_staleness_label as stale %}
+          {% if stale == 'very_old' %}
+            <span class="badge badge-stale-very-old mb-2">現状と異なる場合があります</span>
+          {% elif stale == 'old' %}
+            <span class="badge badge-stale-old mb-2">情報が古い可能性があります</span>
+          {% endif %}
+        {% endwith %}
+
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div class="d-flex gap-2 flex-wrap align-items-center">
+            {% for i in "12345" %}
+              <i class="bi bi-star{% if forloop.counter <= review.overall_rating %}-fill{% endif %} text-warning"></i>
+            {% endfor %}
+            <span class="fw-bold">{{ review.overall_rating }}.0</span>
+            {% if review.is_current %}
+              <span class="badge bg-success-subtle text-success" style="font-size:.7rem;">在職中</span>
+            {% elif review.tenure_end_year %}
+              <span class="badge bg-secondary-subtle text-secondary" style="font-size:.7rem;">離職済み</span>
+            {% endif %}
+          </div>
+          <span class="text-muted small">{{ review.created_at|date:"Y年n月" }}</span>
+        </div>
+
+        <!-- 数値情報チップ（全員に表示） -->
+        <div class="d-flex flex-wrap gap-2 mb-3 small">
+          {% if review.employment_type %}<span class="bool-chip yes">{{ review.get_employment_type_display }}</span>{% endif %}
+          {% if review.annual_salary %}<span class="bool-chip yes">年収 {{ review.annual_salary }}万円</span>{% endif %}
+          {% if review.overtime_hours is not None %}<span class="bool-chip {% if review.overtime_hours > 40 %}no{% else %}yes{% endif %}">残業 {{ review.overtime_hours }}h/月</span>{% endif %}
+          <span class="bool-chip {% if review.has_oncall %}yes{% else %}no{% endif %}">オンコール{% if review.has_oncall %}あり{% else %}なし{% endif %}</span>
+          <span class="bool-chip {% if review.has_night_duty %}yes{% else %}no{% endif %}">当直{% if review.has_night_duty %}あり{% else %}なし{% endif %}</span>
+          <span class="bool-chip {% if review.has_night_shift %}yes{% else %}no{% endif %}">夜勤{% if review.has_night_shift %}あり{% else %}なし{% endif %}</span>
+          {% if review.has_blood_sampling is not None %}<span class="bool-chip {% if review.has_blood_sampling %}yes{% else %}no{% endif %}">採血{% if review.has_blood_sampling %}あり{% else %}なし{% endif %}</span>{% endif %}
+          {% if review.oncall_night_frequency %}<span class="bool-chip yes">頻度：{{ review.get_oncall_night_frequency_display }}</span>{% endif %}
+          {% if review.work_style %}<span class="bool-chip yes">{{ review.get_work_style_display }}</span>{% endif %}
+          {% if review.education_system %}<span class="bool-chip yes">教育体制：{{ review.get_education_system_display }}</span>{% endif %}
+          {% if review.equipment_age %}<span class="bool-chip yes">機器：{{ review.get_equipment_age_display }}</span>{% endif %}
+          {% if review.male_ratio is not None %}
+          <span class="bool-chip yes d-inline-flex align-items-center gap-1" style="padding-right:8px;">
+            <span style="font-size:.75rem;">男{{ review.male_ratio }}:女{{ review.female_ratio }}</span>
+            <span style="width:48px; height:6px; border-radius:3px; overflow:hidden; display:inline-block; background:#F472B6;">
+              <span style="display:block; height:100%; width:{{ review.male_ratio }}0%; background:#4A86D8;"></span>
+            </span>
+          </span>
+          {% endif %}
+          {% if review.average_age %}<span class="bool-chip yes">平均年齢 {{ review.average_age }}歳</span>{% endif %}
+          {% if review.research_opportunity %}<span class="bool-chip yes">学会：{{ review.get_research_opportunity_display }}</span>{% endif %}
+          {% if review.certification_support %}<span class="bool-chip yes">資格サポート：{{ review.get_certification_support_display }}</span>{% endif %}
+        </div>
+
+        <!-- 詳細評価バー -->
+        {% if user.is_authenticated %}
+        {% if review.salary_rating or review.relationship_rating or review.education_rating or review.equipment_rating %}
+        <div class="mb-3 p-2 rounded" style="background:#F8FAFF; font-size:.8rem;">
+          {% if review.salary_rating %}
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="text-muted" style="width:5rem;">給与</span>
+            <div class="progress flex-grow-1" style="height:6px;">
+              <div class="progress-bar bg-primary" style="width:{{ review.salary_rating|floatformat:0 }}0%"></div>
+            </div>
+            <span class="fw-bold" style="width:1.2rem;">{{ review.salary_rating }}</span>
+          </div>
+          {% endif %}
+          {% if review.relationship_rating %}
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="text-muted" style="width:5rem;">人間関係</span>
+            <div class="progress flex-grow-1" style="height:6px;">
+              <div class="progress-bar bg-primary" style="width:{{ review.relationship_rating|floatformat:0 }}0%"></div>
+            </div>
+            <span class="fw-bold" style="width:1.2rem;">{{ review.relationship_rating }}</span>
+          </div>
+          {% endif %}
+          {% if review.education_rating %}
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="text-muted" style="width:5rem;">教育体制</span>
+            <div class="progress flex-grow-1" style="height:6px;">
+              <div class="progress-bar bg-primary" style="width:{{ review.education_rating|floatformat:0 }}0%"></div>
+            </div>
+            <span class="fw-bold" style="width:1.2rem;">{{ review.education_rating }}</span>
+          </div>
+          {% endif %}
+          {% if review.equipment_rating %}
+          <div class="d-flex align-items-center gap-2">
+            <span class="text-muted" style="width:5rem;">設備・機器</span>
+            <div class="progress flex-grow-1" style="height:6px;">
+              <div class="progress-bar bg-primary" style="width:{{ review.equipment_rating|floatformat:0 }}0%"></div>
+            </div>
+            <span class="fw-bold" style="width:1.2rem;">{{ review.equipment_rating }}</span>
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+        {% endif %}
+
+        <!-- 口コミ本文 -->
+        {% if user.is_authenticated %}
+          <div class="mb-2">
+            <h6 class="fw-bold text-success small mb-1"><i class="bi bi-hand-thumbs-up"></i> 良かった点</h6>
+            <p class="small mb-0">{{ review.good_points }}</p>
+          </div>
+          <div class="mb-2">
+            <h6 class="fw-bold text-danger small mb-1"><i class="bi bi-hand-thumbs-down"></i> 気になった点</h6>
+            <p class="small mb-0">{{ review.concerns }}</p>
+          </div>
+          <div>
+            <h6 class="fw-bold text-secondary small mb-1"><i class="bi bi-person-check"></i> 向いている人</h6>
+            <p class="small mb-0">{{ review.suitable_for }}</p>
+          </div>
+          {% if review.joining_gap %}
+          <div class="mt-2">
+            <h6 class="fw-bold small mb-1" style="color:#92400E;"><i class="bi bi-exclamation-circle"></i> 入職後のギャップ</h6>
+            <p class="small mb-0">{{ review.joining_gap }}</p>
+          </div>
+          {% endif %}
+          {% if review.get_tenure_display %}
+          <p class="text-muted small mt-2 mb-1"><i class="bi bi-calendar3"></i> 在籍期間：{{ review.get_tenure_display }}</p>
+          {% endif %}
+          <div class="mt-2 d-flex justify-content-between align-items-center">
+            <form action="{% url 'review_helpful' review.pk %}" method="post" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm {% if review.pk in helpful_ids %}btn-success{% else %}btn-outline-secondary{% endif %}" style="font-size:.75rem;">
+                <i class="bi bi-hand-thumbs-up{% if review.pk in helpful_ids %}-fill{% endif %}"></i>
+                参考になった
+                {% with review.helpful_votes.count as cnt %}{% if cnt > 0 %}<span class="ms-1">{{ cnt }}</span>{% endif %}{% endwith %}
+              </button>
+            </form>
+            <a href="{% url 'objection_create' review.pk %}" class="text-muted small text-decoration-none">
+              <i class="bi bi-flag"></i> 内容に異議がある
+            </a>
+          </div>
+        {% else %}
+          <!-- 未ログイン1件目: テキストをぼかし -->
+          <div class="position-relative rounded overflow-hidden" style="min-height:96px;">
+            <div class="p-2" style="filter:blur(5px);user-select:none;" aria-hidden="true">
+              <p class="small fw-bold text-success mb-1">良かった点</p>
+              <p class="small mb-2">口コミの内容を読むには会員登録が必要です。</p>
+              <p class="small fw-bold text-danger mb-1">気になった点</p>
+              <p class="small mb-0">転職活動に役立つ年収・残業・職場環境のリアルな情報が掲載されています。</p>
+            </div>
+            <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+                 style="background:rgba(255,255,255,0.7);">
+              <div class="text-center">
+                <p class="small fw-bold mb-2"><i class="bi bi-lock"></i> 続きを読むには登録が必要です</p>
+                <a href="{% url 'account_signup' %}?next={{ request.path }}" class="btn btn-primary btn-sm me-1">
+                  <i class="bi bi-person-plus"></i> 無料登録
+                </a>
+                <a href="{% url 'account_login' %}?next={{ request.path }}" class="btn btn-outline-secondary btn-sm">
+                  ログイン
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+
+    <!-- 未ログイン かつ 2件以上あれば残り件数の壁を表示 -->
+    {% if not user.is_authenticated and review_count > 1 %}
+    <div class="card border-primary mb-3">
+      <div class="card-body text-center py-4">
+        <div class="fs-2 mb-2">🔒</div>
+        <p class="fw-bold mb-1">残り {{ review_count|add:"-1" }}件の口コミを見るには登録が必要です</p>
+        <p class="text-muted small mb-3">無料登録で年収・残業・職場環境のすべての口コミを閲覧できます</p>
+        <a href="{% url 'account_signup' %}?next={{ request.path }}" class="btn btn-primary me-2">
+          <i class="bi bi-person-plus"></i> 無料登録
+        </a>
+        <a href="{% url 'account_login' %}?next={{ request.path }}" class="btn btn-outline-secondary">
+          ログイン
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if review_count == 0 %}
+    <div class="text-center py-4 text-muted">
+      <i class="bi bi-chat-square fs-1 d-block mb-2"></i>
+      まだレビューがありません。最初の投稿者になりましょう！
+    </div>
+    {% endif %}
+  </div>
+  </div>
+
+  <!-- サイドバー -->
+  <div class="col-lg-4">
+    {% if job_posts %}
+    <div class="card border-primary mb-3">
+      <div class="card-header bg-primary text-white fw-bold">
+        <i class="bi bi-briefcase"></i> 求人情報
+      </div>
+      <div class="card-body">
+        {% for job in job_posts %}
+        <div class="mb-3 {% if not forloop.last %}border-bottom pb-3{% endif %}">
+          <h6 class="fw-bold mb-1">{{ job.title }}</h6>
+          <p class="text-muted small mb-1">{{ job.get_employment_type_display }} · {{ job.get_salary_display }}</p>
+          <p class="small text-truncate-2">{{ job.description }}</p>
+        </div>
+        {% endfor %}
+        <p class="text-muted x-small mt-2 mb-0" style="font-size:.75rem">※ 求人情報は施設が管理しています。直接お問い合わせください。</p>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- 転職アフィリエイト -->
+    <div class="card bg-light border-0 mb-3">
+      <div class="card-body">
+        <h6 class="fw-bold mb-2"><i class="bi bi-briefcase-fill text-primary"></i> 転職を検討中の方へ</h6>
+        <p class="small text-muted mb-3">臨床検査技師専門の転職サポートを活用しよう</p>
+        <a href="#" rel="sponsored" class="btn btn-warning btn-sm w-100 mb-2">
+          メディカル技師ワーカーで探す
+        </a>
+        <a href="#" rel="sponsored" class="btn btn-outline-primary btn-sm w-100">
+          レバウェル医療技師で探す
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

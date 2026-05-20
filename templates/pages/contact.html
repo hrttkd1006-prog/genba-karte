@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}お問い合わせ | げんばカルテ{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <h1 class="h4 fw-bold mb-2">お問い合わせ</h1>
+    <p class="text-muted small mb-4">掲載内容への異議申し立ては、各レビューページ下部の「内容に異議がある」リンクをご利用ください。</p>
+
+    {% if sent %}
+      <div class="alert alert-success">
+        <i class="bi bi-check-circle"></i> お問い合わせを受け付けました。内容を確認のうえ、ご返答いたします。
+      </div>
+    {% else %}
+      <div class="card">
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label fw-semibold">お名前</label>
+              <input type="text" name="name" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">メールアドレス <span class="text-danger">*</span></label>
+              <input type="email" name="email" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">お問い合わせ種別</label>
+              <select name="category" class="form-select">
+                <option value="general">一般的なお問い合わせ</option>
+                <option value="report">不適切なコンテンツの報告</option>
+                <option value="hospital">病院・施設情報について</option>
+                <option value="other">その他</option>
+              </select>
+            </div>
+            <div class="mb-4">
+              <label class="form-label fw-semibold">お問い合わせ内容 <span class="text-danger">*</span></label>
+              <textarea name="message" class="form-control" rows="6" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-send"></i> 送信する
+            </button>
+          </form>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

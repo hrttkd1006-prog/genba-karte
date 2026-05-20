@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}求人一覧 | げんばカルテ{% endblock %}
+{% block meta_description %}臨床検査技師の求人一覧。全国の病院・検査センターの求人情報を探せます。{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div>
+    <h1 class="h4 fw-bold mb-0"><i class="bi bi-briefcase text-primary"></i> 求人一覧</h1>
+    <p class="text-muted small mb-0 mt-1">{{ total }}件の求人が見つかりました</p>
+  </div>
+</div>
+
+<!-- 検索フォーム -->
+<div class="card border-0 mb-4" style="background:#F8FAFF;">
+  <div class="card-body py-3">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-12 col-sm-4">
+        <input type="text" name="keyword" value="{{ keyword }}" placeholder="施設名・職種で検索"
+               class="form-control form-control-sm">
+      </div>
+      <div class="col-6 col-sm-3">
+        <select name="prefecture" class="form-select form-select-sm">
+          <option value="">都道府県</option>
+          {% for val, label in prefectures %}
+            <option value="{{ val }}" {% if val == prefecture %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-sm-2">
+        <select name="employment_type" class="form-select form-select-sm">
+          <option value="">雇用形態</option>
+          {% for val, label in employment_types %}
+            <option value="{{ val }}" {% if val == employment_type %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-sm-2">
+        <select name="facility_type" class="form-select form-select-sm">
+          <option value="">施設種別</option>
+          {% for val, label in facility_types %}
+            <option value="{{ val }}" {% if val == facility_type %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-sm-2">
+        <button type="submit" class="btn btn-primary btn-sm w-100">
+          <i class="bi bi-search"></i> 検索
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if jobs %}
+  <div class="row g-3">
+    {% for job in jobs %}
+    <div class="col-md-6">
+      <div class="card h-100 hospital-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-1">
+            <span class="badge bg-primary-subtle text-primary">{{ job.get_employment_type_display }}</span>
+            <span class="text-muted" style="font-size:.75rem;">{{ job.created_at|date:"Y年n月j日" }}</span>
+          </div>
+          <h2 class="h6 fw-bold mb-1 mt-2">{{ job.title }}</h2>
+          <p class="text-muted small mb-1">
+            <i class="bi bi-building"></i>
+            <a href="{% url 'hospital_detail' job.hospital.pk %}" class="text-decoration-none text-muted">
+              {{ job.hospital.name }}
+            </a>
+          </p>
+          <p class="text-muted small mb-2">
+            <i class="bi bi-geo-alt"></i> {{ job.hospital.prefecture }}
+          </p>
+          {% if job.salary_min or job.salary_max %}
+          <p class="fw-bold text-primary small mb-2">
+            <i class="bi bi-cash"></i> {{ job.get_salary_display }}
+          </p>
+          {% endif %}
+          <p class="small text-truncate-2 mb-0" style="color:var(--muted);">{{ job.description }}</p>
+        </div>
+        <div class="card-footer bg-transparent border-0 pt-0">
+          <a href="{% url 'hospital_detail' job.hospital.pk %}" class="btn btn-outline-primary btn-sm">
+            施設の口コミ・詳細を見る <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="text-center py-5 text-muted">
+    <i class="bi bi-briefcase fs-1 d-block mb-2"></i>
+    <p class="mb-0">条件に合う求人が見つかりませんでした。</p>
+    <a href="{% url 'job_list' %}" class="btn btn-outline-secondary btn-sm mt-3">条件をリセット</a>
+  </div>
+{% endif %}
+
+{% endblock %}

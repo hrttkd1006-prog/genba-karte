@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}異議申し立て | げんばカルテ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <h1 class="h4 fw-bold mb-1">異議申し立てフォーム</h1>
+    <p class="text-muted small mb-4">{{ review.hospital.name }} に投稿されたレビューへの申し立て</p>
+
+    <div class="alert alert-warning small">
+      <i class="bi bi-exclamation-triangle"></i>
+      申し立て後、投稿者へ確認メールを送信します。<strong>72時間以内</strong>に返答がない場合、投稿は自動的に非公開になります。
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label fw-semibold">病院・施設名 <span class="text-danger">*</span></label>
+        <input type="text" name="hospital_name" class="form-control" required placeholder="{{ review.hospital.name }}">
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-semibold">ご担当者のメールアドレス <span class="text-danger">*</span></label>
+        <input type="email" name="contact_email" class="form-control" required>
+      </div>
+      <div class="mb-4">
+        <label class="form-label fw-semibold">申し立て内容 <span class="text-danger">*</span></label>
+        <textarea name="reason" class="form-control" rows="5" required
+          placeholder="事実と異なる点を具体的にご記入ください"></textarea>
+      </div>
+      <button type="submit" class="btn btn-danger">
+        <i class="bi bi-flag"></i> 異議申し立てを送信
+      </button>
+      <a href="{% url 'hospital_detail' review.hospital.pk %}" class="btn btn-outline-secondary ms-2">キャンセル</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

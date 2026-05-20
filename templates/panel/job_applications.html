@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}求人掲載申込 | 管理{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h4 fw-bold mb-0"><i class="bi bi-briefcase text-primary"></i> 求人掲載申込</h1>
+  <a href="{% url 'panel_dashboard' %}" class="btn btn-sm btn-outline-secondary">ダッシュボードへ</a>
+</div>
+
+<div class="d-flex gap-1 mb-3">
+  <a href="?status=pending" class="btn btn-sm {% if status_filter == 'pending' %}btn-primary{% else %}btn-outline-secondary{% endif %}">未処理</a>
+  <a href="?status=approved" class="btn btn-sm {% if status_filter == 'approved' %}btn-primary{% else %}btn-outline-secondary{% endif %}">承認済み</a>
+  <a href="?status=rejected" class="btn btn-sm {% if status_filter == 'rejected' %}btn-primary{% else %}btn-outline-secondary{% endif %}">却下</a>
+  <a href="?status=" class="btn btn-sm {% if not status_filter %}btn-primary{% else %}btn-outline-secondary{% endif %}">すべて</a>
+</div>
+
+{% if messages %}
+  {% for msg in messages %}
+    <div class="alert alert-{{ msg.tags }} alert-dismissible fade show">
+      {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+
+{% if items %}
+<div class="table-responsive">
+  <table class="table table-hover align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>施設名</th>
+        <th>担当者</th>
+        <th>メール</th>
+        <th>電話</th>
+        <th>申込日</th>
+        <th>ステータス</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td class="fw-semibold">{{ item.facility_name }}</td>
+        <td>{{ item.contact_name }}</td>
+        <td class="small"><a href="mailto:{{ item.email }}">{{ item.email }}</a></td>
+        <td class="small">{{ item.phone|default:"-" }}</td>
+        <td class="small text-muted">{{ item.created_at|date:"Y/m/d" }}</td>
+        <td>
+          {% if item.status == 'pending' %}
+            <span class="badge bg-warning text-dark">未処理</span>
+          {% elif item.status == 'approved' %}
+            <span class="badge bg-success">承認済み</span>
+          {% else %}
+            <span class="badge bg-secondary">却下</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if item.status == 'pending' %}
+          <div class="d-flex gap-1">
+            <form method="post" action="{% url 'panel_job_application_action' item.pk %}">
+              {% csrf_token %}<input type="hidden" name="action" value="approve">
+              <button class="btn btn-sm btn-success">承認</button>
+            </form>
+            <form method="post" action="{% url 'panel_job_application_action' item.pk %}">
+              {% csrf_token %}<input type="hidden" name="action" value="reject">
+              <button class="btn btn-sm btn-outline-danger">却下</button>
+            </form>
+          </div>
+          {% endif %}
+        </td>
+      </tr>
+      {% if item.message %}
+      <tr class="table-light">
+        <td colspan="7" class="small text-muted ps-3">備考: {{ item.message }}</td>
+      </tr>
+      {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="text-muted text-center py-4">該当する申込はありません。</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,157 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}げんばカルテ - 臨床検査技師の職場レビュー{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}臨床検査技師の職場リアル口コミ。病院・検査センターのレビューを探す・投稿する。{% endblock %}">
+  <!-- OGP -->
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+  <meta property="og:title" content="{% block og_title %}げんばカルテ - 臨床検査技師の職場レビュー{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}臨床検査技師の職場リアル口コミ。病院・検査センターのレビューを探す・投稿する。{% endblock %}">
+  <meta property="og:url" content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}">
+  <meta property="og:site_name" content="げんばカルテ">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="{% block tw_title %}げんばカルテ{% endblock %}">
+  <meta name="twitter:description" content="{% block tw_description %}臨床検査技師の職場リアル口コミサイト{% endblock %}">
+  <!-- /OGP -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'top' %}">
+      <i class="bi bi-clipboard2-pulse"></i> げんばカルテ<span class="brand-sub">げんかる</span>
+    </a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'hospital_list' %}">
+            <i class="bi bi-building"></i> 病院を探す
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'job_list' %}">
+            <i class="bi bi-briefcase"></i> 求人を探す
+          </a>
+        </li>
+      </ul>
+      <ul class="navbar-nav align-items-center gap-1">
+        {% if user.is_authenticated %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+              <i class="bi bi-person-circle"></i> {{ user.email|truncatechars:20 }}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end border-0 shadow" style="border-radius:12px;">
+              <li><a class="dropdown-item rounded-2" href="{% url 'profile' %}"><i class="bi bi-person text-primary"></i> プロフィール</a></li>
+              <li><a class="dropdown-item rounded-2" href="{% url 'favorite_list' %}"><i class="bi bi-heart-fill text-warning"></i> お気に入り</a></li>
+              {% if user.is_hospital_admin %}
+              <li><a class="dropdown-item rounded-2" href="{% url 'hospital_admin_dashboard' %}"><i class="bi bi-briefcase text-primary"></i> 求人管理</a></li>
+              {% endif %}
+              {% if user.is_staff %}
+              <li><a class="dropdown-item rounded-2" href="{% url 'panel_dashboard' %}"><i class="bi bi-shield-lock text-primary"></i> 管理ダッシュボード</a></li>
+              {% endif %}
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <form action="{% url 'account_logout' %}" method="post" class="px-3">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-outline-danger w-100">ログアウト</button>
+                </form>
+              </li>
+            </ul>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'account_login' %}">ログイン</a>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-signup ms-1" href="{% url 'account_signup' %}">
+              <i class="bi bi-person-plus"></i> 無料登録
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main class="py-4">
+  <div class="container">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </div>
+</main>
+
+<footer class="bg-dark text-white py-4 mt-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <h6 class="fw-bold"><i class="bi bi-clipboard2-pulse"></i> げんばカルテ</h6>
+        <p class="text-white-50 small">臨床検査技師の職場リアル口コミサイト</p>
+      </div>
+      <div class="col-md-4 mb-3">
+        <h6 class="fw-bold">サービス</h6>
+        <ul class="list-unstyled small">
+          <li><a href="{% url 'hospital_list' %}" class="text-white-50 text-decoration-none">病院を探す</a></li>
+          <li><a href="{% url 'account_signup' %}" class="text-white-50 text-decoration-none">無料会員登録</a></li>
+          <li><a href="{% url 'hospital_admin_dashboard' %}" class="text-white-50 text-decoration-none">求人掲載（病院向け）</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4 mb-3">
+        <h6 class="fw-bold">ガイド</h6>
+        <ul class="list-unstyled small">
+          <li><a href="{% url 'terms' %}" class="text-white-50 text-decoration-none">利用規約</a></li>
+          <li><a href="{% url 'privacy' %}" class="text-white-50 text-decoration-none">プライバシーポリシー</a></li>
+          <li><a href="{% url 'tokusho' %}" class="text-white-50 text-decoration-none">特定商取引法に基づく表記</a></li>
+          <li><a href="{% url 'contact' %}" class="text-white-50 text-decoration-none">お問い合わせ</a></li>
+        </ul>
+      </div>
+    </div>
+    <hr class="border-secondary">
+    <p class="text-white-50 small text-center mb-0">&copy; 2025 げんばカルテ. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_scripts %}{% endblock %}
+
+<!-- Cookie同意バナー -->
+<div id="cookie-banner" class="position-fixed bottom-0 start-0 end-0 bg-dark text-white p-3 d-none" style="z-index:1060;">
+  <div class="container d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <p class="mb-0 small">
+      当サービスはCookieを使用してログイン状態の維持・利便性向上を行います。
+      詳しくは<a href="{% url 'privacy' %}" class="text-warning">プライバシーポリシー</a>をご覧ください。
+    </p>
+    <div class="d-flex gap-2 flex-shrink-0">
+      <button id="cookie-accept" class="btn btn-warning btn-sm fw-bold">同意する</button>
+      <a href="{% url 'privacy' %}" class="btn btn-outline-light btn-sm">詳細を見る</a>
+    </div>
+  </div>
+</div>
+<script>
+(function() {
+  var banner = document.getElementById('cookie-banner');
+  if (!localStorage.getItem('cookie_consent')) {
+    banner.classList.remove('d-none');
+  }
+  document.getElementById('cookie-accept').addEventListener('click', function() {
+    localStorage.setItem('cookie_consent', '1');
+    banner.classList.add('d-none');
+  });
+})();
+</script>
+</body>
+</html>

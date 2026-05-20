@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ hospital.name }} にレビューを投稿 | げんばカルテ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'hospital_list' %}">病院一覧</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'hospital_detail' hospital.pk %}">{{ hospital.name }}</a></li>
+        <li class="breadcrumb-item active">レビューを書く</li>
+      </ol>
+    </nav>
+
+    <h1 class="h4 fw-bold mb-1">{{ hospital.name }}</h1>
+    <p class="text-muted small mb-4">{{ hospital.prefecture }} · レビューを投稿</p>
+
+    <div class="alert alert-info small">
+      <i class="bi bi-shield-check"></i>
+      投稿は匿名で公開されます。個人が特定される情報（個人名など）は記載しないでください。
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <!-- 総合評価 -->
+      <div class="card mb-3">
+        <div class="card-header fw-bold">総合評価 <span class="text-danger">*</span></div>
+        <div class="card-body">
+          <div class="star-rating" id="star-rating">
+            {% for val, label in form.overall_rating.field.choices %}
+            <input type="radio" class="star-radio" name="overall_rating" id="star{{ val }}" value="{{ val }}"
+              {% if form.overall_rating.value == val|stringformat:"s" %}checked{% endif %}>
+            <label for="star{{ val }}" title="{{ label }}"><i class="bi bi-star-fill"></i></label>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- 詳細評価 -->
+      <div class="card mb-3">
+        <div class="card-header fw-bold">項目別評価（任意）</div>
+        <div class="card-body">
+          <p class="text-muted small mb-3">各項目を1〜5で評価してください（未回答でも投稿できます）</p>
+          <div class="row g-3">
+            <div class="col-6 col-sm-3">
+              <label class="form-label small fw-semibold">💰 給与</label>
+              {{ form.salary_rating }}
+            </div>
+            <div class="col-6 col-sm-3">
+              <label class="form-label small fw-semibold">🤝 人間関係</label>
+              {{ form.relationship_rating }}
+            </div>
+            <div class="col-6 col-sm-3">
+              <label class="form-label small fw-semibold">📚 教育体制</label>
+              {{ form.education_rating }}
+            </div>
+            <div class="col-6 col-sm-3">
+              <label class="form-label small fw-semibold">🔬 設備・機器</label>
+              {{ form.equipment_rating }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 数値情報 -->
+      <div class="card mb-3">
+        <div class="card-header fw-bold">職場データ（わかる範囲で入力）</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-sm-6">{{ form.annual_salary|as_crispy_field }}</div>
+            <div class="col-sm-6">{{ form.overtime_hours|as_crispy_field }}</div>
+            <div class="col-sm-6">{{ form.paid_leave_rate|as_crispy_field }}</div>
+            <div class="col-sm-6">{{ form.technician_count|as_crispy_field }}</div>
+            <div class="col-sm-4">{{ form.employment_type|as_crispy_field }}</div>
+            <div class="col-sm-4">{{ form.education_system|as_crispy_field }}</div>
+            <div class="col-sm-4">{{ form.equipment_age|as_crispy_field }}</div>
+          </div>
+
+          <div class="mt-3">
+            <label class="form-label fw-semibold">勤務体制</label>
+            <div class="d-flex gap-4 flex-wrap">
+              <div class="form-check">{{ form.has_oncall }} <label class="form-check-label" for="{{ form.has_oncall.id_for_label }}">オンコールあり</label></div>
+              <div class="form-check">{{ form.has_night_duty }} <label class="form-check-label" for="{{ form.has_night_duty.id_for_label }}">当直あり</label></div>
+              <div class="form-check">{{ form.has_night_shift }} <label class="form-check-label" for="{{ form.has_night_shift.id_for_label }}">夜勤あり</label></div>
+              <div class="form-check">{{ form.has_blood_sampling }} <label class="form-check-label" for="{{ form.has_blood_sampling.id_for_label }}">採血行為あり</label></div>
+            </div>
+          </div>
+          <div class="row g-3 mt-1">
+            <div class="col-sm-6">{{ form.oncall_night_frequency|as_crispy_field }}</div>
+            <div class="col-sm-6">{{ form.work_style|as_crispy_field }}</div>
+            <div class="col-sm-6">
+              <label class="form-label fw-semibold small">技師の男女比</label>
+              {{ form.male_ratio }}
+              <div class="d-flex align-items-center gap-2">
+                <span class="small text-primary fw-bold" style="min-width:2rem;" id="maleLabel">5</span>
+                <div class="flex-grow-1 position-relative" style="height:28px;">
+                  <div id="ratioBar" class="rounded" style="height:12px; margin-top:8px; background:linear-gradient(to right, #4A86D8 50%, #F472B6 50%);"></div>
+                  <input type="range" id="ratioSlider" min="0" max="10" value="5"
+                    class="position-absolute w-100" style="top:0; opacity:0; cursor:pointer; height:28px;">
+                </div>
+                <span class="small text-danger fw-bold" style="min-width:2rem; text-align:right;" id="femaleLabel">5</span>
+              </div>
+              <div class="d-flex justify-content-between text-muted" style="font-size:.7rem; margin-top:2px;">
+                <span>男</span><span>女</span>
+              </div>
+            </div>
+            <div class="col-sm-6">{{ form.average_age|as_crispy_field }}</div>
+            <div class="col-sm-6">{{ form.research_opportunity|as_crispy_field }}</div>
+            <div class="col-sm-6">{{ form.certification_support|as_crispy_field }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 在籍期間 -->
+      <div class="card mb-3">
+        <div class="card-header fw-bold">在籍期間</div>
+        <div class="card-body">
+          <div class="row g-2 align-items-center">
+            <div class="col-auto">
+              <select name="tenure_start_year" class="form-select form-select-sm">
+                {% for val, label in form.tenure_start_year.field.choices %}
+                  <option value="{{ val }}" {% if form.tenure_start_year.value == val|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-auto">
+              <select name="tenure_start_month" class="form-select form-select-sm">
+                {% for val, label in form.tenure_start_month.field.choices %}
+                  <option value="{{ val }}" {% if form.tenure_start_month.value == val|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-auto text-muted">〜</div>
+            <div class="col-auto">
+              <select name="tenure_end_year" class="form-select form-select-sm" id="endYearSelect">
+                {% for val, label in form.tenure_end_year.field.choices %}
+                  <option value="{{ val }}" {% if form.tenure_end_year.value == val|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-auto">
+              <select name="tenure_end_month" class="form-select form-select-sm" id="endMonthSelect">
+                {% for val, label in form.tenure_end_month.field.choices %}
+                  <option value="{{ val }}" {% if form.tenure_end_month.value == val|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="form-check mt-2">
+            {{ form.is_current }}
+            <label class="form-check-label" for="{{ form.is_current.id_for_label }}">現在も在籍中</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- テキスト -->
+      <div class="card mb-3">
+        <div class="card-header fw-bold">口コミ本文 <span class="text-danger">*</span></div>
+        <div class="card-body">
+          {{ form.good_points|as_crispy_field }}
+          {{ form.concerns|as_crispy_field }}
+          {{ form.suitable_for|as_crispy_field }}
+          {{ form.joining_gap|as_crispy_field }}
+        </div>
+      </div>
+
+      <!-- 同意 -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="form-check mb-2">
+            {{ form.agreed_to_terms }}
+            <label class="form-check-label" for="{{ form.agreed_to_terms.id_for_label }}">
+              この内容は実際の経験に基づく事実・意見です
+            </label>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" name="agreed_to_legal" id="agreed_to_legal" required>
+            <label class="form-check-label" for="agreed_to_legal">
+              虚偽の内容は法的責任を負う可能性があることを理解しています
+            </label>
+          </div>
+          {% if form.errors %}
+            <div class="alert alert-danger mt-2 small">入力内容を確認してください。</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="d-grid">
+        <button type="submit" class="btn btn-primary btn-lg">
+          <i class="bi bi-send"></i> レビューを投稿する
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // 男女比スライダー
+  const slider = document.getElementById('ratioSlider');
+  const bar = document.getElementById('ratioBar');
+  const maleLabel = document.getElementById('maleLabel');
+  const femaleLabel = document.getElementById('femaleLabel');
+  const hiddenInput = document.getElementById('id_male_ratio');
+  function updateRatio() {
+    const v = parseInt(slider.value);
+    maleLabel.textContent = v;
+    femaleLabel.textContent = 10 - v;
+    bar.style.background = `linear-gradient(to right, #4A86D8 ${v*10}%, #F472B6 ${v*10}%)`;
+    if (hiddenInput) hiddenInput.value = v;
+  }
+  if (slider) {
+    slider.addEventListener('input', updateRatio);
+    updateRatio();
+  }
+
+  // 「現在も在籍中」チェック時に終了年月を無効化
+  const currentCheck = document.getElementById('{{ form.is_current.id_for_label }}');
+  const endYear = document.getElementById('endYearSelect');
+  const endMonth = document.getElementById('endMonthSelect');
+  function toggleEndDate() {
+    endYear.disabled = currentCheck.checked;
+    endMonth.disabled = currentCheck.checked;
+  }
+  currentCheck.addEventListener('change', toggleEndDate);
+  toggleEndDate();
+</script>
+{% endblock %}

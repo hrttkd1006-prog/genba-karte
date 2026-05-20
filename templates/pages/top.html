@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}げんばカルテ - 臨床検査技師の職場リアル口コミ{% endblock %}
+
+{% block content %}
+
+<!-- ── Hero ────────────────────────────────────── -->
+<div class="hero-section">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-7 text-white mb-4 mb-md-0">
+        <div class="mb-2" style="font-size:.85rem; opacity:.7; letter-spacing:.5px;">🔬 臨床検査技師専門の口コミサイト</div>
+        <h1 class="display-6 fw-bold mb-3 lh-sm">職場のリアルを、<br>次の一歩に。</h1>
+        <p class="mb-4" style="opacity:.85; font-size:1.05rem;">転職・就活に役立つリアルな職場情報を<br class="d-none d-sm-block">全国337施設以上から探せます。</p>
+        <form action="{% url 'hospital_list' %}" method="get" class="d-flex gap-2 flex-wrap">
+          <input type="text" name="keyword" placeholder="施設名・地名で検索" class="form-control" style="max-width:260px;">
+          <select name="prefecture" class="form-select" style="max-width:150px;">
+            <option value="">都道府県</option>
+            {% for val, label in prefectures %}
+              <option value="{{ val }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn btn-light fw-bold px-4">
+            <i class="bi bi-search"></i> 検索
+          </button>
+        </form>
+      </div>
+      <div class="col-md-5 text-center d-none d-md-block">
+        <!-- イラスト：カルテ＋星 -->
+        <svg viewBox="0 0 280 240" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width:260px; filter:drop-shadow(0 8px 24px rgba(0,0,0,.15));">
+          <!-- 背景の装飾円 -->
+          <circle cx="140" cy="120" r="100" fill="white" fill-opacity="0.07"/>
+          <circle cx="140" cy="120" r="70"  fill="white" fill-opacity="0.07"/>
+          <!-- カルテ本体 -->
+          <rect x="70" y="28" width="140" height="180" rx="14" fill="white" fill-opacity="0.18"/>
+          <rect x="70" y="28" width="140" height="180" rx="14" stroke="white" stroke-opacity="0.5" stroke-width="1.5"/>
+          <!-- クリップ -->
+          <rect x="108" y="18" width="64" height="22" rx="8" fill="white" fill-opacity="0.3"/>
+          <rect x="125" y="14" width="30" height="12" rx="6" fill="white" fill-opacity="0.4"/>
+          <!-- テキスト行 -->
+          <rect x="90" y="68"  width="100" height="7" rx="3.5" fill="white" fill-opacity="0.35"/>
+          <rect x="90" y="84"  width="80"  height="7" rx="3.5" fill="white" fill-opacity="0.25"/>
+          <rect x="90" y="100" width="100" height="7" rx="3.5" fill="white" fill-opacity="0.35"/>
+          <rect x="90" y="116" width="60"  height="7" rx="3.5" fill="white" fill-opacity="0.25"/>
+          <!-- 星評価 -->
+          <circle cx="97"  cy="148" r="8" fill="#FCD34D"/>
+          <circle cx="117" cy="148" r="8" fill="#FCD34D"/>
+          <circle cx="137" cy="148" r="8" fill="#FCD34D"/>
+          <circle cx="157" cy="148" r="8" fill="#FCD34D"/>
+          <circle cx="177" cy="148" r="8" fill="white" fill-opacity="0.3"/>
+          <!-- 評価スコア -->
+          <rect x="90" y="165" width="50" height="7" rx="3.5" fill="white" fill-opacity="0.3"/>
+          <!-- 装飾スパークル -->
+          <path d="M42 55 L45 47 L48 55 L56 58 L48 61 L45 69 L42 61 L34 58 Z" fill="white" fill-opacity="0.5"/>
+          <path d="M232 42 L234 37 L236 42 L241 44 L236 46 L234 51 L232 46 L227 44 Z" fill="white" fill-opacity="0.4"/>
+          <path d="M245 180 L247 175 L249 180 L254 182 L249 184 L247 189 L245 184 L240 182 Z" fill="white" fill-opacity="0.35"/>
+          <circle cx="50"  cy="160" r="5" fill="white" fill-opacity="0.2"/>
+          <circle cx="240" cy="110" r="4" fill="white" fill-opacity="0.2"/>
+          <circle cx="58"  cy="100" r="3" fill="white" fill-opacity="0.15"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Stats ────────────────────────────────────── -->
+<div class="row g-3 mb-5">
+  <div class="col-4">
+    <div class="stat-card">
+      <div class="stat-icon mx-auto" style="background:#EBF2FF;">
+        <i class="bi bi-person-check" style="color:var(--primary);"></i>
+      </div>
+      <div class="fw-bold fs-5" style="color:var(--primary);">無料</div>
+      <div class="text-muted small mt-1">会員登録・閲覧</div>
+    </div>
+  </div>
+  <div class="col-4">
+    <div class="stat-card">
+      <div class="stat-icon mx-auto" style="background:#EDE9FE;">
+        <i class="bi bi-incognito" style="color:#7C68EE;"></i>
+      </div>
+      <div class="fw-bold fs-5" style="color:#7C68EE;">匿名</div>
+      <div class="text-muted small mt-1">レビュー投稿</div>
+    </div>
+  </div>
+  <div class="col-4">
+    <div class="stat-card">
+      <div class="stat-icon mx-auto" style="background:#ECFDF5;">
+        <i class="bi bi-shield-check" style="color:#059669;"></i>
+      </div>
+      <div class="fw-bold fs-5" style="color:#059669;">AI</div>
+      <div class="text-muted small mt-1">自動モデレーション</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 最新レビュー ──────────────────────────────── -->
+{% if recent_reviews %}
+<div class="mb-5">
+  <div class="section-title">
+    <span class="section-title-dot"></span>
+    最新の口コミ
+  </div>
+  <div class="row g-3">
+    {% for review in recent_reviews %}
+    <div class="col-md-6">
+      <div class="card review-card h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <a href="{% url 'hospital_detail' review.hospital.pk %}" class="fw-bold text-decoration-none" style="color:var(--text);">
+              {{ review.hospital.name }}
+            </a>
+            <span class="rating-badge">
+              <i class="bi bi-star-fill star-icon"></i>{{ review.overall_rating }}
+            </span>
+          </div>
+          <p class="text-muted small mb-2">
+            <i class="bi bi-geo-alt"></i> {{ review.hospital.prefecture }}
+          </p>
+          <p class="small text-truncate-2 mb-0" style="color:var(--muted);">{{ review.good_points }}</p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- ── CTA ──────────────────────────────────────── -->
+<div class="cta-block p-4 text-center mb-4">
+  <div class="mb-2" style="font-size:2rem;">✍️</div>
+  <h3 class="h5 fw-bold mb-2">あなたの経験をシェアしよう</h3>
+  <p class="text-muted small mb-3">投稿は匿名。次の世代の臨床検査技師の参考になります。</p>
+  {% if user.is_authenticated %}
+    <a href="{% url 'hospital_list' %}" class="btn btn-primary px-4">
+      <i class="bi bi-pencil-square"></i> 施設を選んでレビューを書く
+    </a>
+  {% else %}
+    <a href="{% url 'account_signup' %}" class="btn btn-primary me-2 px-4">
+      <i class="bi bi-person-plus"></i> 無料会員登録
+    </a>
+    <a href="{% url 'account_login' %}" class="btn btn-outline-secondary px-3">ログイン</a>
+  {% endif %}
+</div>
+
+<!-- ── サイトについて ─────────────────────────────── -->
+<div class="card border-0 mb-4 p-4" style="background:#F8FAFF;">
+  <div class="d-flex gap-3 align-items-start">
+    <div class="flex-shrink-0" style="font-size:1.6rem;">🔬</div>
+    <div>
+      <div class="fw-bold mb-1" style="font-size:.8rem; color:var(--primary); letter-spacing:.5px;">このサイトについて</div>
+      <p class="mb-0 small" style="color:var(--text); line-height:1.8;">
+        私自身、臨床検査技師として働くなかで、転職・就活のたびに「実際の職場ってどうなんだろう」と思っても調べる手段がありませんでした。求人を見るだけでエージェント登録が必要だったり、リアルな声が聞ける場所がなかったり。<br>
+        げんばカルテは、そんな経験から生まれた、<strong>臨床検査技師が自分たちのために作ったサービス</strong>です。
+      </p>
+    </div>
+  </div>
+</div>
+
+{% if not user.is_authenticated or user.is_hospital_admin %}
+<!-- ── 病院・施設の方へ ──────────────────────────── -->
+<div class="card border-0 text-center p-4" style="background:linear-gradient(135deg,#EBF2FF,#EDE9FE); border-radius:var(--radius);">
+  <div class="mb-2" style="font-size:2rem;">🏥</div>
+  <h3 class="h6 fw-bold mb-1">病院・施設の方へ</h3>
+  <p class="text-muted small mb-3">臨床検査技師に特化した求人掲載サービスを提供しています。</p>
+  {% if user.is_hospital_admin %}
+    <a href="{% url 'hospital_admin_dashboard' %}" class="btn btn-outline-primary btn-sm px-4">
+      <i class="bi bi-briefcase"></i> 管理ダッシュボード
+    </a>
+  {% else %}
+    <a href="{% url 'for_hospitals' %}" class="btn btn-outline-primary btn-sm px-4">
+      <i class="bi bi-briefcase"></i> 求人掲載について
+    </a>
+  {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  .hero-section { margin: -24px -12px 40px !important; }
+  @media(min-width:576px){ .hero-section { margin: -24px -24px 40px !important; } }
+</style>
+{% endblock %}

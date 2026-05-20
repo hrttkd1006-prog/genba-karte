@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}病院・施設の求人掲載を始める | げんばカルテ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <h1 class="h4 fw-bold mb-1">求人掲載のお申し込み</h1>
+    <p class="text-muted small mb-4">担当施設を選択して、管理者として登録してください。</p>
+
+    <!-- 料金案内 -->
+    <div class="card bg-primary bg-opacity-10 border-primary mb-4">
+      <div class="card-body">
+        <h2 class="h6 fw-bold mb-2"><i class="bi bi-info-circle"></i> 掲載料金</h2>
+        <div class="row g-2">
+          <div class="col-6">
+            <div class="bg-white rounded p-3 text-center border">
+              <div class="fw-bold fs-5">月額 3,000円<small class="fs-6 text-muted">（税別）</small></div>
+              <div class="text-muted small">月ごとの契約・いつでも解約可</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="bg-white rounded p-3 text-center border border-primary">
+              <div class="fw-bold fs-5 text-primary">年額 30,000円<small class="fs-6 text-muted">（税別）</small></div>
+              <div class="text-muted small">2ヶ月分お得</div>
+            </div>
+          </div>
+        </div>
+        <ul class="small text-muted mt-2 mb-0 ps-3">
+          <li>求人票の作成・編集・削除が自由に行えます</li>
+          <li>掲載は決済完了後すぐに有効化されます</li>
+          <li>求職者からの問い合わせ窓口は施設側で対応してください</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header fw-bold">施設の登録申請</div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          {{ form|crispy }}
+          <div class="d-grid mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">
+              <i class="bi bi-building-check"></i> 申請する
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <p class="text-muted small text-center mt-3">
+      <i class="bi bi-shield-check"></i>
+      求職者への個人情報の提供はありません。職業紹介は行っておりません。
+    </p>
+  </div>
+</div>
+{% endblock %}

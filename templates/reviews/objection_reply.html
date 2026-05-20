@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}投稿内容の確認 | げんばカルテ{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <h1 class="h4 fw-bold mb-3">投稿内容についてのご確認</h1>
+    <div class="alert alert-warning">
+      <strong>返答期限：</strong> {{ objection.reply_deadline|date:"Y年n月j日 H:i" }}
+    </div>
+    <p>施設側から以下の申し立てがありました。</p>
+    <blockquote class="blockquote border-start border-danger ps-3">
+      <p class="small">{{ objection.reason }}</p>
+    </blockquote>
+    <p class="small text-muted">投稿内容が事実である場合は、下記のフォームからご返答ください。期限までに返答がない場合、投稿は自動的に非公開になります。</p>
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label fw-semibold">ご返答内容</label>
+        <textarea name="reply" class="form-control" rows="5" required
+          placeholder="投稿内容が事実である根拠や補足をご記入ください"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">返答を送信する</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

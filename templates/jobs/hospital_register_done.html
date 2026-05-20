@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}申し込み受付完了 | げんばカルテ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6 text-center py-5">
+    <div class="fs-1 mb-3">✅</div>
+    <h1 class="h4 fw-bold mb-2">申し込みを受け付けました</h1>
+    <p class="text-muted mb-4">
+      <strong>{{ facility_name }}</strong> 様の掲載申し込みを受け付けました。<br>
+      運営チームが内容を確認後、数営業日以内にご登録のメールアドレスへご連絡します。
+    </p>
+
+    <div class="card border-0 bg-light p-4 text-start mb-4">
+      <h2 class="h6 fw-bold mb-3"><i class="bi bi-list-check text-primary"></i> 承認後の流れ</h2>
+      <ol class="small text-muted mb-0 ps-3">
+        <li class="mb-1">承認メールが届きます</li>
+        <li class="mb-1">メール記載のURLからアカウントを作成（申請時と同じメールアドレスで登録）</li>
+        <li class="mb-1">ダッシュボードからプランを契約</li>
+        <li>求人情報を掲載開始</li>
+      </ol>
+    </div>
+
+    <a href="{% url 'top' %}" class="btn btn-outline-primary">
+      <i class="bi bi-house"></i> トップページへ
+    </a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}新着レビュー | げんばカルテ{% endblock %}
+
+{% block content %}
+<h1 class="h4 fw-bold mb-4"><i class="bi bi-clock-history text-primary"></i> 新着レビュー</h1>
+
+{% if reviews %}
+  {% for review in reviews %}
+  <div class="card mb-3 shadow-sm">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <span class="badge bg-primary-subtle text-primary mb-1">{{ review.hospital.get_facility_type_display }}</span>
+          <h5 class="mb-0">
+            <a href="{% url 'hospital_detail' review.hospital.pk %}" class="text-decoration-none fw-bold">{{ review.hospital.name }}</a>
+          </h5>
+          <p class="text-muted small mb-0"><i class="bi bi-geo-alt"></i> {{ review.hospital.prefecture }}</p>
+        </div>
+        <div class="text-end">
+          <div class="d-flex gap-1 justify-content-end mb-1">
+            {% for i in "12345" %}
+              <i class="bi bi-star{% if forloop.counter <= review.overall_rating %}-fill{% endif %} text-warning" style="font-size:.85rem;"></i>
+            {% endfor %}
+            <span class="small fw-bold ms-1">{{ review.overall_rating }}.0</span>
+          </div>
+          <span class="text-muted small">{{ review.created_at|date:"Y年n月d日" }}</span>
+        </div>
+      </div>
+
+      <div class="d-flex flex-wrap gap-2 mb-2 small">
+        {% if review.employment_type %}<span class="bool-chip yes">{{ review.get_employment_type_display }}</span>{% endif %}
+        {% if review.annual_salary %}<span class="bool-chip yes">年収 {{ review.annual_salary }}万円</span>{% endif %}
+        {% if review.overtime_hours is not None %}<span class="bool-chip {% if review.overtime_hours > 40 %}no{% else %}yes{% endif %}">残業 {{ review.overtime_hours }}h/月</span>{% endif %}
+        {% if review.is_current %}
+          <span class="badge bg-success-subtle text-success">在職中</span>
+        {% elif review.tenure_end_year %}
+          <span class="badge bg-secondary-subtle text-secondary">離職済み</span>
+        {% endif %}
+      </div>
+
+      {% if user.is_authenticated %}
+        <p class="small mb-1"><span class="fw-bold text-success">良かった点：</span>{{ review.good_points|truncatechars:100 }}</p>
+        <p class="small mb-0"><span class="fw-bold text-danger">気になった点：</span>{{ review.concerns|truncatechars:100 }}</p>
+      {% else %}
+        <div class="position-relative rounded overflow-hidden" style="min-height:60px;">
+          <div class="p-2" style="filter:blur(4px);user-select:none;" aria-hidden="true">
+            <p class="small mb-1">良かった点：口コミを読むには会員登録が必要です。</p>
+            <p class="small mb-0">気になった点：転職に役立つリアルな情報が掲載されています。</p>
+          </div>
+          <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+               style="background:rgba(255,255,255,0.7);">
+            <a href="{% url 'account_signup' %}" class="btn btn-primary btn-sm">
+              <i class="bi bi-lock"></i> 無料登録して読む
+            </a>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <div class="text-center py-5 text-muted">
+    <i class="bi bi-chat-square fs-1 d-block mb-2"></i>
+    まだレビューがありません
+  </div>
+{% endif %}
+{% endblock %}

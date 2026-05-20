@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}返答を受け付けました | げんばカルテ{% endblock %}
+{% block content %}
+<div class="text-center py-5">
+  <i class="bi bi-check-circle-fill text-success fs-1 mb-3 d-block"></i>
+  <h1 class="h4 fw-bold mb-2">返答を受け付けました</h1>
+  <p class="text-muted">運営チームが内容を確認し、判断いたします。<br>しばらくお待ちください。</p>
+  <a href="{% url 'top' %}" class="btn btn-primary mt-3">トップページへ</a>
+</div>
+{% endblock %}

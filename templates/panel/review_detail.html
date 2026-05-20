@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}レビュー詳細 | 管理{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h4 fw-bold mb-0">{{ item.hospital.name }} のレビュー</h1>
+  <a href="{% url 'panel_reviews' %}" class="btn btn-sm btn-outline-secondary">一覧へ戻る</a>
+</div>
+
+{% if messages %}
+  {% for msg in messages %}
+    <div class="alert alert-{{ msg.tags }}">{{ msg }}</div>
+  {% endfor %}
+{% endif %}
+
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card mb-3">
+      <div class="card-header fw-bold">基本情報</div>
+      <div class="card-body small">
+        <dl class="row mb-0">
+          <dt class="col-5">施設</dt><dd class="col-7">{{ item.hospital.name }}</dd>
+          <dt class="col-5">投稿者</dt><dd class="col-7">{{ item.user.email|default:"匿名" }}</dd>
+          <dt class="col-5">投稿日</dt><dd class="col-7">{{ item.created_at|date:"Y/m/d H:i" }}</dd>
+          <dt class="col-5">ステータス</dt><dd class="col-7">{{ item.get_status_display }}</dd>
+          <dt class="col-5">AI判定</dt><dd class="col-7">{{ item.get_ai_judgment_display|default:"-" }}</dd>
+        </dl>
+        {% if item.ai_reason %}
+        <div class="mt-2 p-2 bg-light rounded small">{{ item.ai_reason }}</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card mb-3">
+      <div class="card-header fw-bold">評価</div>
+      <div class="card-body small">
+        <dl class="row mb-0">
+          <dt class="col-6">総合評価</dt><dd class="col-6">★{{ item.overall_rating }}</dd>
+          <dt class="col-6">給与</dt><dd class="col-6">{{ item.salary_rating|default:"-" }}</dd>
+          <dt class="col-6">人間関係</dt><dd class="col-6">{{ item.relationship_rating|default:"-" }}</dd>
+          <dt class="col-6">教育体制</dt><dd class="col-6">{{ item.education_rating|default:"-" }}</dd>
+          <dt class="col-6">設備・機器</dt><dd class="col-6">{{ item.equipment_rating|default:"-" }}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card mb-3">
+      <div class="card-header fw-bold">口コミ本文</div>
+      <div class="card-body small">
+        {% if item.good_points %}<p><strong>良かった点:</strong><br>{{ item.good_points }}</p>{% endif %}
+        {% if item.concerns %}<p><strong>気になった点:</strong><br>{{ item.concerns }}</p>{% endif %}
+        {% if item.suitable_for %}<p><strong>向いている人:</strong><br>{{ item.suitable_for }}</p>{% endif %}
+        {% if item.joining_gap %}<p class="mb-0"><strong>入職後のギャップ:</strong><br>{{ item.joining_gap }}</p>{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if item.status == 'pending' %}
+<div class="d-flex gap-2 mt-2">
+  <form method="post" action="{% url 'panel_review_action' item.pk %}">
+    {% csrf_token %}<input type="hidden" name="action" value="approve">
+    <button class="btn btn-success">承認して公開</button>
+  </form>
+  <form method="post" action="{% url 'panel_review_action' item.pk %}">
+    {% csrf_token %}<input type="hidden" name="action" value="reject">
+    <button class="btn btn-outline-danger">却下する</button>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

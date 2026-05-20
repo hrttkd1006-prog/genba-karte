@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /accounts/
+Disallow: /jobs/dashboard/
+Disallow: /jobs/checkout/
+Disallow: /reviews/write/
+Disallow: /reviews/objection/
+Disallow: /reviews/objection-reply/
+
+Sitemap: https://genba-karte.jp/sitemap.xml

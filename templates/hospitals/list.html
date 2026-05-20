@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}病院・施設一覧 | げんばカルテ{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h4 fw-bold mb-0"><i class="bi bi-building text-primary"></i> 病院・施設を探す</h1>
+</div>
+
+<!-- 検索フォーム -->
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="get" class="row g-2">
+      <div class="col-md-4">
+        <input type="text" name="keyword" value="{{ keyword }}" placeholder="施設名・住所で検索" class="form-control">
+      </div>
+      <div class="col-md-3">
+        <select name="prefecture" class="form-select">
+          <option value="">都道府県（すべて）</option>
+          {% for val, label in prefectures %}
+            <option value="{{ val }}" {% if val == selected_prefecture %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select name="facility_type" class="form-select">
+          <option value="">施設種別（すべて）</option>
+          <option value="hospital" {% if facility_type == 'hospital' %}selected{% endif %}>病院</option>
+          <option value="clinic" {% if facility_type == 'clinic' %}selected{% endif %}>クリニック・診療所</option>
+          <option value="lab" {% if facility_type == 'lab' %}selected{% endif %}>検査センター</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="bi bi-search"></i> 検索
+        </button>
+      </div>
+    </form>
+    {% if user.is_authenticated %}
+    <div class="border-top pt-2 mt-2 text-end">
+      <a href="{% url 'facility_request_create' %}" class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-plus-circle"></i> 施設が見つからない場合は登録申請
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- ソート・件数 -->
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <p class="text-muted small mb-0">{{ hospitals.count }} 件の施設</p>
+  <div class="d-flex gap-1">
+    <a href="?{% if keyword %}keyword={{ keyword }}&{% endif %}{% if selected_prefecture %}prefecture={{ selected_prefecture }}&{% endif %}{% if facility_type %}facility_type={{ facility_type }}&{% endif %}sort=reviews"
+       class="btn btn-sm {% if sort == 'reviews' or not sort %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+      口コミ数順
+    </a>
+    <a href="?{% if keyword %}keyword={{ keyword }}&{% endif %}{% if selected_prefecture %}prefecture={{ selected_prefecture }}&{% endif %}{% if facility_type %}facility_type={{ facility_type }}&{% endif %}sort=rating"
+       class="btn btn-sm {% if sort == 'rating' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+      評価順
+    </a>
+    <a href="?{% if keyword %}keyword={{ keyword }}&{% endif %}{% if selected_prefecture %}prefecture={{ selected_prefecture }}&{% endif %}{% if facility_type %}facility_type={{ facility_type }}&{% endif %}sort=name"
+       class="btn btn-sm {% if sort == 'name' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+      名前順
+    </a>
+    <a href="{% url 'hospital_map' %}" class="btn btn-sm btn-outline-secondary ms-2">
+      <i class="bi bi-map"></i> 地図で見る
+    </a>
+  </div>
+</div>
+
+{% if hospitals %}
+<div class="row g-3">
+  {% for hospital in hospitals %}
+  <div class="col-md-6 col-lg-4">
+    <a href="{% url 'hospital_detail' hospital.pk %}" class="text-decoration-none">
+      <div class="card hospital-card h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-1">
+            <h2 class="h6 fw-bold text-dark mb-0">{{ hospital.name }}</h2>
+            {% if hospital.avg_rating %}
+              <span class="rating-badge flex-shrink-0 ms-2">
+                <i class="bi bi-star-fill star-icon"></i>{{ hospital.avg_rating|floatformat:1 }}
+              </span>
+            {% endif %}
+          </div>
+          <p class="text-muted small mb-2">
+            <i class="bi bi-geo-alt"></i> {{ hospital.prefecture }}
+            {% if hospital.beds %}&nbsp;·&nbsp;{{ hospital.beds }}床{% endif %}
+          </p>
+          <div class="d-flex gap-2 flex-wrap">
+            <span class="badge bg-light text-dark border">{{ hospital.get_facility_type_display }}</span>
+            <span class="text-muted small">
+              <i class="bi bi-chat-square-text"></i>
+              {{ hospital.review_count }} 件のレビュー
+            </span>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5 text-muted">
+  <i class="bi bi-building fs-1 d-block mb-2"></i>
+  施設が見つかりませんでした。条件を変えてお試しください。
+</div>
+{% endif %}
+
+{% endblock %}

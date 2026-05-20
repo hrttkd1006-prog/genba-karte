@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}病院・施設の求人掲載サービス | げんばカルテ{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<div class="text-center py-5 mb-4" style="background: linear-gradient(135deg,#0d6efd,#0a58ca); color:#fff; margin: -24px -12px 32px; padding: 56px 24px !important;">
+  <h1 class="h3 fw-bold mb-2">臨床検査技師に届く<br>求人掲載サービス</h1>
+  <p class="mb-4 text-white-50">げんばカルテは臨床検査技師に特化した職場口コミ・求人サービスです。<br>転職を検討している現役技師に直接アプローチできます。</p>
+  <a href="{% url 'hospital_register' %}" class="btn btn-light btn-lg fw-bold px-5">
+    <i class="bi bi-building-check"></i> 掲載を申し込む（審査無料）
+  </a>
+</div>
+
+<!-- 特徴 -->
+<h2 class="h5 fw-bold text-center mb-3">選ばれる理由</h2>
+<div class="row g-3 mb-5">
+  <div class="col-md-4">
+    <div class="card h-100 border-0 shadow-sm text-center p-3">
+      <div class="fs-1 mb-2">🔬</div>
+      <h3 class="h6 fw-bold">ターゲット特化</h3>
+      <p class="text-muted small mb-0">臨床検査技師専門サイトのため、求人に関心の高いユーザーにリーチできます。</p>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card h-100 border-0 shadow-sm text-center p-3">
+      <div class="fs-1 mb-2">⭐</div>
+      <h3 class="h6 fw-bold">口コミと連動</h3>
+      <p class="text-muted small mb-0">職場口コミページと連動しているため、施設の魅力を求職者に伝えやすい環境です。</p>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card h-100 border-0 shadow-sm text-center p-3">
+      <div class="fs-1 mb-2">✏️</div>
+      <h3 class="h6 fw-bold">自由に編集</h3>
+      <p class="text-muted small mb-0">管理画面から求人の作成・編集・削除がいつでも自由に行えます。</p>
+    </div>
+  </div>
+</div>
+
+<!-- 掲載の流れ -->
+<h2 class="h5 fw-bold text-center mb-3">掲載までの流れ</h2>
+<div class="row g-2 mb-5">
+  {% for step in steps %}
+  <div class="col-12">
+    <div class="d-flex align-items-start gap-3 p-3 bg-white border rounded">
+      <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;font-weight:bold;">{{ forloop.counter }}</div>
+      <div>
+        <div class="fw-bold small">{{ step.title }}</div>
+        <div class="text-muted small">{{ step.desc }}</div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- CTA -->
+<div class="text-center py-4">
+  <h2 class="h5 fw-bold mb-3">まずは審査申し込みから（審査無料）</h2>
+  <a href="{% url 'hospital_register' %}" class="btn btn-primary btn-lg px-5">
+    <i class="bi bi-building-check"></i> 掲載を申し込む
+  </a>
+  <p class="text-muted small mt-2">審査・初期費用は無料です。プラン契約は承認後に行えます。</p>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  @media(min-width:576px){
+    div[style*="margin: -24px -12px"] { margin: -24px -24px 32px !important; }
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}お気に入り施設 | げんばカルテ{% endblock %}
+
+{% block content %}
+<h1 class="h4 fw-bold mb-4"><i class="bi bi-heart-fill text-danger"></i> お気に入り施設</h1>
+
+{% if favorites %}
+  <div class="row g-3">
+    {% for fav in favorites %}
+    <div class="col-md-6">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <span class="badge bg-primary-subtle text-primary mb-1">{{ fav.hospital.get_facility_type_display }}</span>
+              <h5 class="card-title mb-1">
+                <a href="{% url 'hospital_detail' fav.hospital.pk %}" class="text-decoration-none">{{ fav.hospital.name }}</a>
+              </h5>
+              <p class="text-muted small mb-2"><i class="bi bi-geo-alt"></i> {{ fav.hospital.prefecture }} {{ fav.hospital.address }}</p>
+            </div>
+            <form action="{% url 'toggle_favorite' fav.hospital.pk %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-outline-danger" title="お気に入りを解除">
+                <i class="bi bi-heart-fill"></i>
+              </button>
+            </form>
+          </div>
+          {% with fav.hospital.get_average_rating as avg %}
+          {% if avg %}
+            <div class="d-flex align-items-center gap-1 small">
+              <i class="bi bi-star-fill text-warning"></i>
+              <span class="fw-bold">{{ avg }}</span>
+              <span class="text-muted">（{{ fav.hospital.get_review_count }}件）</span>
+            </div>
+          {% else %}
+            <span class="text-muted small">まだレビューがありません</span>
+          {% endif %}
+          {% endwith %}
+          <p class="text-muted small mt-2 mb-0">追加日: {{ fav.created_at|date:"Y年n月d日" }}</p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="text-center py-5 text-muted">
+    <i class="bi bi-heart fs-1 d-block mb-3"></i>
+    <p class="mb-3">お気に入りに登録した施設はありません</p>
+    <a href="{% url 'hospital_list' %}" class="btn btn-primary">施設を探す</a>
+  </div>
+{% endif %}
+{% endblock %}

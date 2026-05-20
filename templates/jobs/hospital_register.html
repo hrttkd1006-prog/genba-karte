@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}掲載申し込み | げんばカルテ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="mb-4">
+      <a href="{% url 'for_hospitals' %}" class="text-muted small"><i class="bi bi-arrow-left"></i> 掲載サービスページに戻る</a>
+    </div>
+
+    <h1 class="h4 fw-bold mb-1">掲載申し込みフォーム</h1>
+    <p class="text-muted small mb-4">審査・初期費用は無料です。承認後にプランをご契約ください。</p>
+
+    <!-- 料金案内 -->
+    <div class="card bg-light border-0 mb-4">
+      <div class="card-body">
+        <h2 class="h6 fw-bold mb-2"><i class="bi bi-tag text-primary"></i> 掲載料金</h2>
+        <div class="row g-2">
+          <div class="col-6">
+            <div class="bg-white rounded p-3 text-center border">
+              <div class="text-muted small">月額プラン</div>
+              <div class="fw-bold fs-5">3,000<small class="text-muted fs-6">円（税別）</small></div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="bg-white rounded p-3 text-center border border-primary">
+              <div class="text-muted small">年額プラン</div>
+              <div class="fw-bold fs-5 text-primary">30,000<small class="text-muted fs-6">円（税別）</small></div>
+            </div>
+          </div>
+        </div>
+        <p class="text-muted small mt-2 mb-0">承認後にプランをお選びいただけます。申し込み・審査は無料です。</p>
+      </div>
+    </div>
+
+    <!-- 利用規約 -->
+    <div class="card mb-4">
+      <div class="card-header fw-bold">
+        <i class="bi bi-file-text"></i> 掲載事業者向け利用規約
+      </div>
+      <div class="card-body">
+        <div class="border rounded p-3 bg-light" style="max-height:240px; overflow-y:auto; font-size:0.82rem; line-height:1.7;">
+          <p><strong>第1条（目的）</strong><br>
+          本規約は、げんばカルテ（以下「当サービス」）の掲載事業者（以下「掲載事業者」）が求人情報を掲載するにあたり、遵守すべき事項を定めるものです。</p>
+
+          <p><strong>第2条（掲載内容）</strong><br>
+          掲載事業者は、掲載する求人情報が事実に基づき正確であることを保証するものとします。虚偽・誇大な表現、または求職者を誤解させる表現の使用を禁止します。</p>
+
+          <p><strong>第3条（禁止事項）</strong><br>
+          掲載事業者は以下の行為を行ってはなりません。<br>
+          ① 職業安定法・労働関係法令に違反する求人の掲載<br>
+          ② 差別的表現・不適切な表現を含む内容の掲載<br>
+          ③ 当サービスの運営を妨げる行為<br>
+          ④ 他の掲載事業者または求職者への不当な働きかけ</p>
+
+          <p><strong>第4条（料金・解約）</strong><br>
+          掲載料金は月額3,000円（税別）または年額30,000円（税別）です。解約は掲載事業者ダッシュボードよりいつでも手続きできます。解約後は当該期間の終了をもって掲載が停止されます。返金は原則として行いません。</p>
+
+          <p><strong>第5条（個人情報）</strong><br>
+          当サービスは職業紹介事業者ではありません。求職者の個人情報を掲載事業者へ提供することはありません。求職者からの問い合わせは、掲載事業者が独自に設けた窓口で対応してください。</p>
+
+          <p><strong>第6条（掲載の停止・拒否）</strong><br>
+          当サービスは、掲載内容が本規約に違反すると判断した場合、予告なく掲載を停止または申請を却下することができます。</p>
+
+          <p><strong>第7条（免責）</strong><br>
+          当サービスは、掲載された求人情報の内容、および求人掲載を通じて生じたいかなる損害についても責任を負いません。</p>
+
+          <p class="mb-0"><strong>第8条（規約の変更）</strong><br>
+          当サービスは、必要に応じて本規約を改定することがあります。改定後の規約はサービス上に掲載した時点で効力を持ちます。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 申し込みフォーム -->
+    <div class="card">
+      <div class="card-header fw-bold">
+        <i class="bi bi-building-check"></i> 施設情報の入力
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          {{ form|crispy }}
+          <div class="d-grid mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">
+              <i class="bi bi-send"></i> 申し込みを送信する
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <p class="text-muted small text-center mt-3">
+      <i class="bi bi-shield-check"></i>
+      送信後、運営が内容を確認します。数営業日以内にメールにてご連絡します。
+    </p>
+  </div>
+</div>
+{% endblock %}
