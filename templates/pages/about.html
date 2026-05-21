@@ -13,6 +13,20 @@
   <p class="text-muted" style="font-size:.95rem;">このサイトができるまでの話と、これからの話。</p>
 </div>
 
+<!-- ── 運営者プロフィール ──────────────────────────── -->
+<div class="row justify-content-center mb-2">
+  <div class="col-lg-7 col-md-9">
+    <div class="card border-0 p-4 mb-4 text-center" style="background:var(--card); border:1px solid var(--border) !important; border-radius:var(--radius);">
+      <img src="{% static 'images/operator.png' %}" alt="運営者イラスト"
+           style="width:120px; height:120px; object-fit:cover; border-radius:50%; margin:0 auto 16px; border:3px solid var(--primary-light);">
+      <div class="fw-bold mb-1" style="font-size:1rem;">臨床検査技師・サイト運営者</div>
+      <p class="text-muted small mb-0" style="line-height:1.8;">
+        病院・検査センターでの勤務経験をもとに、同じ職種の仲間が転職・就活で困らないようにとげんばカルテを立ち上げました。現場で働く技師さんの声を大切にしながら、日々サイトを改善しています。
+      </p>
+    </div>
+  </div>
+</div>
+
 <!-- ── 本文 ───────────────────────────────────────── -->
 <div class="row justify-content-center">
   <div class="col-lg-7 col-md-9">
@@ -97,6 +111,82 @@
       <a href="{% url 'contact' %}" class="btn btn-primary px-4 mt-1">
         <i class="bi bi-chat-dots"></i> メッセージを送る
       </a>
+    </div>
+
+    <!-- FAQ -->
+    <div class="mb-4">
+      <h2 class="h5 fw-bold mb-3">
+        <span class="me-2" style="font-size:1.3rem;">❓</span>
+        よくある質問
+      </h2>
+      <div class="accordion" id="faqAccordion">
+
+        <div class="accordion-item border-0 mb-2" style="border-radius:var(--radius-sm) !important; overflow:hidden; box-shadow:var(--shadow-sm);">
+          <h3 class="accordion-header">
+            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq1" style="border-radius:var(--radius-sm); font-size:.95rem;">
+              本当に匿名で投稿できますか？
+            </button>
+          </h3>
+          <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body text-muted small" style="line-height:1.9;">
+              はい、投稿内容に氏名・所属などの個人情報は一切含まれません。施設側や他のユーザーに投稿者が特定される仕組みはありませんので、安心してご利用ください。
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item border-0 mb-2" style="border-radius:var(--radius-sm) !important; overflow:hidden; box-shadow:var(--shadow-sm);">
+          <h3 class="accordion-header">
+            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq2" style="border-radius:var(--radius-sm); font-size:.95rem;">
+              臨床検査技師以外でも使えますか？
+            </button>
+          </h3>
+          <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body text-muted small" style="line-height:1.9;">
+              口コミの閲覧はどなたでも可能です。ただし投稿は臨床検査技師として働いた経験のある方を対象としています。より正確な情報をみなさんにお届けするため、ご理解いただければ幸いです。
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item border-0 mb-2" style="border-radius:var(--radius-sm) !important; overflow:hidden; box-shadow:var(--shadow-sm);">
+          <h3 class="accordion-header">
+            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq3" style="border-radius:var(--radius-sm); font-size:.95rem;">
+              施設側からお金をもらって口コミを操作することはありますか？
+            </button>
+          </h3>
+          <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body text-muted small" style="line-height:1.9;">
+              一切ありません。求人掲載料をいただくことはありますが、それによって口コミ内容を変更・削除・優遇することは絶対にしません。公正な情報提供がこのサイトの根幹です。
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item border-0 mb-2" style="border-radius:var(--radius-sm) !important; overflow:hidden; box-shadow:var(--shadow-sm);">
+          <h3 class="accordion-header">
+            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq4" style="border-radius:var(--radius-sm); font-size:.95rem;">
+              投稿した口コミを後から削除できますか？
+            </button>
+          </h3>
+          <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body text-muted small" style="line-height:1.9;">
+              はい、マイページから投稿したレビューをいつでも削除できます。
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item border-0 mb-2" style="border-radius:var(--radius-sm) !important; overflow:hidden; box-shadow:var(--shadow-sm);">
+          <h3 class="accordion-header">
+            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq5" style="border-radius:var(--radius-sm); font-size:.95rem;">
+              利用料はかかりますか？
+            </button>
+          </h3>
+          <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body text-muted small" style="line-height:1.9;">
+              会員登録・口コミ閲覧・口コミ投稿はすべて無料です。今後も基本機能は無料で提供し続けます。
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
 
     <!-- 締め -->
