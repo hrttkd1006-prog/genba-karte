@@ -41,6 +41,10 @@ def tokusho(request):
     return render(request, 'pages/tokusho.html')
 
 
+def about(request):
+    return render(request, 'pages/about.html')
+
+
 def contact(request):
     if request.method == 'POST':
         from .models import ContactMessage
