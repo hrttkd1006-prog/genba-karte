@@ -118,36 +118,28 @@
       <div class="card mb-3">
         <div class="card-header fw-bold">在籍期間</div>
         <div class="card-body">
-          <div class="row g-2 align-items-center">
-            <div class="col-auto">
-              <select name="tenure_start_year" class="form-select form-select-sm">
-                {% for val, label in form.tenure_start_year.field.choices %}
-                  <option value="{{ val }}" {% if form.tenure_start_year.value == val|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
-                {% endfor %}
-              </select>
-            </div>
-            <div class="col-auto">
-              <select name="tenure_start_month" class="form-select form-select-sm">
-                {% for val, label in form.tenure_start_month.field.choices %}
-                  <option value="{{ val }}" {% if form.tenure_start_month.value == val|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
-                {% endfor %}
-              </select>
-            </div>
-            <div class="col-auto text-muted">〜</div>
-            <div class="col-auto">
-              <select name="tenure_end_year" class="form-select form-select-sm" id="endYearSelect">
-                {% for val, label in form.tenure_end_year.field.choices %}
-                  <option value="{{ val }}" {% if form.tenure_end_year.value == val|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
-                {% endfor %}
-              </select>
-            </div>
-            <div class="col-auto">
-              <select name="tenure_end_month" class="form-select form-select-sm" id="endMonthSelect">
-                {% for val, label in form.tenure_end_month.field.choices %}
-                  <option value="{{ val }}" {% if form.tenure_end_month.value == val|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
-                {% endfor %}
-              </select>
-            </div>
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <select name="tenure_start_year" class="form-select form-select-sm" style="width:auto;">
+              {% for val, label in form.tenure_start_year.field.choices %}
+                <option value="{{ val }}" {% if form.tenure_start_year.value == val|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+            <select name="tenure_start_month" class="form-select form-select-sm" style="width:auto;">
+              {% for val, label in form.tenure_start_month.field.choices %}
+                <option value="{{ val }}" {% if form.tenure_start_month.value == val|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+            <span class="text-muted">〜</span>
+            <select name="tenure_end_year" class="form-select form-select-sm" id="endYearSelect" style="width:auto;">
+              {% for val, label in form.tenure_end_year.field.choices %}
+                <option value="{{ val }}" {% if form.tenure_end_year.value == val|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+            <select name="tenure_end_month" class="form-select form-select-sm" id="endMonthSelect" style="width:auto;">
+              {% for val, label in form.tenure_end_month.field.choices %}
+                <option value="{{ val }}" {% if form.tenure_end_month.value == val|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
           </div>
           <div class="form-check mt-2">
             {{ form.is_current }}

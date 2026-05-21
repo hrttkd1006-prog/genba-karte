@@ -12,10 +12,10 @@
 <!-- 病院ヘッダー -->
 <div class="card mb-4 border-0 shadow-sm">
   <div class="card-body">
-    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
-      <div>
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+      <div class="flex-grow-1" style="min-width:0;">
         <span class="badge bg-primary-subtle text-primary mb-1">{{ hospital.get_facility_type_display }}</span>
-        <h1 class="h3 fw-bold mb-1">{{ hospital.name }}</h1>
+        <h1 class="h3 fw-bold mb-1" style="word-break:break-word;">{{ hospital.name }}</h1>
         <p class="text-muted mb-1"><i class="bi bi-geo-alt"></i> {{ hospital.prefecture }} {{ hospital.address }}</p>
         {% if hospital.phone %}
           <p class="text-muted small mb-1"><i class="bi bi-telephone"></i> {{ hospital.phone }}</p>
@@ -30,7 +30,7 @@
           {% endif %}
         </div>
       </div>
-      <div class="text-center">
+      <div class="text-center flex-shrink-0">
         {% if avg_rating %}
           <div class="display-4 fw-bold text-warning lh-1">{{ avg_rating }}</div>
           <div class="text-muted small">/ 5.0</div>
