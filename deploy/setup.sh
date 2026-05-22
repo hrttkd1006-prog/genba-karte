@@ -74,7 +74,7 @@ sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_
 sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
 sed -i 's/#PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
 sed -i 's/PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
-systemctl restart sshd
+systemctl restart ssh 2>/dev/null || systemctl restart sshd 2>/dev/null || true
 
 # ── 6. アプリユーザー作成 ────────────────────────────────
 echo "[6/13] アプリユーザーを作成中..."
