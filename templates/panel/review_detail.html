@@ -62,15 +62,27 @@
 </div>
 
 {% if item.status == 'pending' %}
-<div class="d-flex gap-2 mt-2">
-  <form method="post" action="{% url 'panel_review_action' item.pk %}">
-    {% csrf_token %}<input type="hidden" name="action" value="approve">
-    <button class="btn btn-success">承認して公開</button>
-  </form>
-  <form method="post" action="{% url 'panel_review_action' item.pk %}">
-    {% csrf_token %}<input type="hidden" name="action" value="reject">
-    <button class="btn btn-outline-danger">却下する</button>
-  </form>
+<div class="card mt-3">
+  <div class="card-header fw-bold">審査アクション</div>
+  <div class="card-body">
+    <!-- 承認 -->
+    <form method="post" action="{% url 'panel_review_action' item.pk %}" class="mb-3">
+      {% csrf_token %}<input type="hidden" name="action" value="approve">
+      <button class="btn btn-success"><i class="bi bi-check-circle"></i> 承認して公開</button>
+    </form>
+
+    <!-- 却下（理由入力） -->
+    <form method="post" action="{% url 'panel_review_action' item.pk %}">
+      {% csrf_token %}<input type="hidden" name="action" value="reject">
+      <div class="mb-2">
+        <label class="form-label fw-bold small">却下理由（投稿者へメールで送信されます）</label>
+        <textarea name="reject_reason" class="form-control form-control-sm" rows="3"
+          placeholder="例：誹謗中傷にあたる表現が含まれているため掲載できません。内容を修正の上、再投稿をお願いいたします。"></textarea>
+        <div class="form-text text-muted">空欄の場合はメールは送信されません。</div>
+      </div>
+      <button class="btn btn-outline-danger"><i class="bi bi-x-circle"></i> 却下する</button>
+    </form>
+  </div>
 </div>
 {% endif %}
 {% endblock %}

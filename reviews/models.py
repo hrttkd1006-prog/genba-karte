@@ -117,6 +117,7 @@ class Review(models.Model):
     status = models.CharField('公開状態', max_length=20, choices=REVIEW_STATUS_CHOICES, default='pending')
     ai_judgment = models.CharField('AI判定', max_length=10, choices=AI_JUDGMENT_CHOICES, blank=True)
     ai_reason = models.TextField('AI判定理由', blank=True)
+    reject_reason = models.TextField('却下理由（投稿者向け）', blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

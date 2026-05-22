@@ -55,12 +55,33 @@ def review_create(request, hospital_pk):
 
             if ai_result['judgment'] == 'black':
                 review.status = 'rejected'
+                review.reject_reason = ai_result['reason']
             elif ai_result['judgment'] == 'white':
                 review.status = 'approved'
             else:
                 review.status = 'pending'
 
             review.save()
+
+            # AIグレー → 管理者にメールで確認を依頼
+            if review.status == 'pending':
+                admin_email = getattr(settings, 'ADMIN_NOTIFY_EMAIL', None) or settings.DEFAULT_FROM_EMAIL
+                send_mail(
+                    subject=f'【げんばカルテ】要確認のレビューがあります（{hospital.name}）',
+                    message=f"""AIが要確認と判定したレビューがあります。
+
+■ 施設名: {hospital.name}
+■ 投稿者: {review.user.email if review.user else '不明'}
+■ AI判定理由:
+{ai_result['reason']}
+
+管理画面で内容を確認してください:
+{settings.SITE_URL}/{getattr(settings, 'PANEL_URL_PREFIX', 'manage-gk2025')}/reviews/{review.pk}/
+""",
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[admin_email],
+                    fail_silently=True,
+                )
 
             if review.status == 'approved':
                 messages.success(request, 'レビューを投稿しました。ご協力ありがとうございます！')

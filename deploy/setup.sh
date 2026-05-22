@@ -192,6 +192,7 @@ sed -i 's/# server_tokens off;/server_tokens off;/' /etc/nginx/nginx.conf
 # レート制限の設定（ログインページへの連打対策）
 cat > /etc/nginx/conf.d/rate-limit.conf << 'EOF'
 limit_req_zone $binary_remote_addr zone=login:10m rate=5r/m;
+limit_conn_zone $binary_remote_addr zone=conn_limit:10m;
 EOF
 
 cat > /etc/nginx/sites-available/genba-karte << EOF
@@ -225,6 +226,7 @@ server {
     }
 
     location / {
+        limit_conn conn_limit 20;
         include proxy_params;
         proxy_pass http://unix:$APP_DIR/gunicorn.sock;
     }
@@ -245,6 +247,39 @@ ufw --force enable
 echo "SSL証明書を取得中..."
 certbot --nginx -d $DOMAIN -d www.$DOMAIN --non-interactive --agree-tos -m $ADMIN_EMAIL
 
+# ── MySQLバックアップスクリプト作成 ──────────────────────
+echo "MySQLバックアップを設定中..."
+mkdir -p /var/backups/mysql
+
+cat > /usr/local/bin/backup-mysql.sh << 'BACKUP_EOF'
+#!/bin/bash
+BACKUP_DIR="/var/backups/mysql"
+DATE=$(date +%Y%m%d)
+DBNAME="genba_karte"
+DBUSER="genba_user"
+DBPASS=$(grep DB_PASSWORD /home/genba/app/.env | cut -d= -f2)
+
+mysqldump -u "$DBUSER" -p"$DBPASS" "$DBNAME" | gzip > "$BACKUP_DIR/${DBNAME}_${DATE}.sql.gz"
+
+# 7日分より古いバックアップを削除
+find "$BACKUP_DIR" -name "${DBNAME}_*.sql.gz" -mtime +7 -delete
+BACKUP_EOF
+
+chmod +x /usr/local/bin/backup-mysql.sh
+
+# ── cron設定（統計収集・バックアップ・SSL更新チェック） ─
+echo "cronジョブを設定中..."
+cat > /etc/cron.d/genba-karte << CRON_EOF
+# サーバー統計を毎日0:30に収集（管理パネルに表示）
+30 0 * * * $APP_USER $APP_DIR/venv/bin/python $APP_DIR/manage.py collect_server_stats >> /var/log/genba-collect-stats.log 2>&1
+
+# MySQLバックアップを毎日3:00に実行
+0 3 * * * root /usr/local/bin/backup-mysql.sh >> /var/log/genba-mysql-backup.log 2>&1
+
+# SSL証明書の自動更新（certbotが90日ごとに更新）
+0 4 * * * root certbot renew --quiet --deploy-hook "systemctl reload nginx"
+CRON_EOF
+
 echo ""
 echo "========================================"
 echo " セットアップ完了！"
@@ -260,6 +295,10 @@ echo "   - Nginxセキュリティヘッダー"
 echo "   - ログインページレート制限"
 echo "   - MySQLセキュリティ強化"
 echo "   - Nginxバージョン情報非表示"
+echo "   - Nginx同時接続制限（limit_conn）"
+echo "   - MySQLデイリーバックアップ（7日保持）"
+echo "   - SSL証明書自動更新（certbot cron）"
+echo "   - サーバー統計自動収集（管理パネル）"
 echo ""
 echo "⚠️  次にやること："
 echo "  1. $APP_DIR/.env を編集して本番用の値を設定する"

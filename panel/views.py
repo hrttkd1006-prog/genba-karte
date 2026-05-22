@@ -246,6 +246,7 @@ def review_action(request, pk):
         messages.success(request, 'レビューを承認しました。')
     elif action == 'reject':
         review.status = 'rejected'
+        review.reject_reason = request.POST.get('reject_reason', '').strip()
         review.save()
         messages.warning(request, 'レビューを却下しました。')
     elif action == 'delete':
@@ -308,3 +309,97 @@ def user_action(request, pk):
         target.save()
         messages.success(request, f'{target.email} を有効化しました。')
     return redirect('panel_users')
+
+
+# ── サーバーログ ──────────────────────────────────────────
+
+@staff_required
+def server_logs(request):
+    from panel.models import ServerLog
+    logs = ServerLog.objects.order_by('-date')[:30]
+    latest = logs[0] if logs else None
+    return render(request, 'panel/server_logs.html', {
+        'logs': logs,
+        'latest': latest,
+    })
+
+
+# ── 記事管理 ──────────────────────────────────────────
+
+@staff_required
+def article_list_panel(request):
+    from articles.models import Article
+    items = Article.objects.select_related('author').order_by('-created_at')
+    return render(request, 'panel/article_list.html', {'items': items})
+
+
+@staff_required
+def article_create(request):
+    from articles.models import Article, ARTICLE_CATEGORY_CHOICES
+    from django.utils import timezone
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        body = request.POST.get('body', '').strip()
+        category = request.POST.get('category', 'tips')
+        is_published = request.POST.get('is_published') == 'on'
+        thumbnail = request.FILES.get('thumbnail')
+        if title and body:
+            article = Article(
+                title=title,
+                body=body,
+                category=category,
+                is_published=is_published,
+                author=request.user,
+            )
+            if thumbnail:
+                article.thumbnail = thumbnail
+            if is_published:
+                article.published_at = timezone.now()
+            article.save()
+            messages.success(request, '記事を作成しました。')
+            return redirect('panel_article_list')
+        else:
+            messages.error(request, 'タイトルと本文は必須です。')
+    from articles.models import ARTICLE_CATEGORY_CHOICES
+    return render(request, 'panel/article_form.html', {
+        'categories': ARTICLE_CATEGORY_CHOICES,
+        'action': 'create',
+    })
+
+
+@staff_required
+def article_edit(request, pk):
+    from articles.models import Article, ARTICLE_CATEGORY_CHOICES
+    from django.utils import timezone
+    article = get_object_or_404(Article, pk=pk)
+    if request.method == 'POST':
+        article.title = request.POST.get('title', '').strip()
+        article.body = request.POST.get('body', '').strip()
+        article.category = request.POST.get('category', 'tips')
+        was_published = article.is_published
+        article.is_published = request.POST.get('is_published') == 'on'
+        if request.FILES.get('thumbnail'):
+            article.thumbnail = request.FILES['thumbnail']
+        if article.is_published and not was_published:
+            article.published_at = timezone.now()
+        if article.title and article.body:
+            article.save()
+            messages.success(request, '記事を更新しました。')
+            return redirect('panel_article_list')
+        else:
+            messages.error(request, 'タイトルと本文は必須です。')
+    return render(request, 'panel/article_form.html', {
+        'article': article,
+        'categories': ARTICLE_CATEGORY_CHOICES,
+        'action': 'edit',
+    })
+
+
+@staff_required
+@require_POST
+def article_delete(request, pk):
+    from articles.models import Article
+    article = get_object_or_404(Article, pk=pk)
+    article.delete()
+    messages.warning(request, '記事を削除しました。')
+    return redirect('panel_article_list')

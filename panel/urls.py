@@ -18,4 +18,9 @@ urlpatterns = [
     path('users/', views.users, name='panel_users'),
     path('users/<int:pk>/action/', views.user_action, name='panel_user_action'),
     path('change-password/', views.change_password, name='panel_change_password'),
+    path('articles/', views.article_list_panel, name='panel_article_list'),
+    path('articles/create/', views.article_create, name='panel_article_create'),
+    path('articles/<int:pk>/edit/', views.article_edit, name='panel_article_edit'),
+    path('articles/<int:pk>/delete/', views.article_delete, name='panel_article_delete'),
+    path('server-logs/', views.server_logs, name='panel_server_logs'),
 ]

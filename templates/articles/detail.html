@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ article.title }} | げんばカルテ{% endblock %}
+{% block meta_description %}{{ article.body|truncatechars:120 }}{% endblock %}
+{% block og_title %}{{ article.title }} | げんばカルテ{% endblock %}
+{% block og_description %}{{ article.body|truncatechars:120 }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+
+    <!-- パンくず -->
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb small">
+        <li class="breadcrumb-item"><a href="{% url 'top' %}">ホーム</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'article_list' %}">コラム</a></li>
+        <li class="breadcrumb-item active">{{ article.title|truncatechars:30 }}</li>
+      </ol>
+    </nav>
+
+    <!-- サムネイル -->
+    {% if article.thumbnail %}
+    <img src="{{ article.thumbnail.url }}" class="w-100 rounded mb-4" alt="{{ article.title }}" style="max-height:360px;object-fit:cover;">
+    {% endif %}
+
+    <!-- ヘッダー -->
+    <span class="badge bg-primary-subtle text-primary mb-2">{{ article.get_category_display }}</span>
+    <h1 class="h3 fw-bold mb-2">{{ article.title }}</h1>
+    <p class="text-muted small mb-4">
+      <i class="bi bi-calendar3"></i> {{ article.published_at|date:"Y年n月d日" }}
+    </p>
+
+    <!-- 本文 -->
+    <div class="article-body lh-lg" style="font-size:1rem;">
+      {{ article.body|linebreaks }}
+    </div>
+
+    <hr class="my-4">
+    <a href="{% url 'article_list' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-arrow-left"></i> コラム一覧へ戻る
+    </a>
+
+    <!-- 関連記事 -->
+    {% if related %}
+    <div class="mt-5">
+      <h2 class="h5 fw-bold mb-3">関連記事</h2>
+      <div class="row g-3">
+        {% for r in related %}
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <span class="badge bg-primary-subtle text-primary mb-1" style="font-size:.7rem;">{{ r.get_category_display }}</span>
+              <p class="fw-bold small mb-1">{{ r.title }}</p>
+              <a href="{% url 'article_detail' r.slug %}" class="btn btn-sm btn-outline-primary w-100 mt-1">読む</a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}
