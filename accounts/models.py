@@ -52,6 +52,7 @@ class ContactMessage(models.Model):
     category = models.CharField('種別', max_length=20, choices=CONTACT_CATEGORY_CHOICES, blank=True)
     message = models.TextField('内容')
     is_read = models.BooleanField('確認済み', default=False)
+    ip_address = models.GenericIPAddressField('IPアドレス', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

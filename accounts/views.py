@@ -45,11 +45,35 @@ def about(request):
     return render(request, 'pages/about.html')
 
 
+def _get_client_ip(request):
+    forwarded = request.META.get('HTTP_X_FORWARDED_FOR')
+    if forwarded:
+        return forwarded.split(',')[0].strip()
+    return request.META.get('REMOTE_ADDR', '')
+
+
 def contact(request):
     if request.method == 'POST':
         from .models import ContactMessage
         from django.core.mail import send_mail
         from django.conf import settings
+        from django.utils import timezone
+        import datetime
+
+        # ハニーポット（ボット対策）
+        if request.POST.get('website', ''):
+            return render(request, 'pages/contact.html', {'sent': True})
+
+        # IPレートリミット（1時間に5件まで）
+        ip = _get_client_ip(request)
+        recent_count = ContactMessage.objects.filter(
+            ip_address=ip,
+            created_at__gte=timezone.now() - datetime.timedelta(hours=1)
+        ).count() if ip else 0
+        if recent_count >= 5:
+            messages.error(request, '送信回数の上限に達しました。しばらく時間をおいてからお試しください。')
+            return render(request, 'pages/contact.html')
+
         name = request.POST.get('name', '')
         email = request.POST.get('email', '')
         category = request.POST.get('category', '')
@@ -60,6 +84,7 @@ def contact(request):
                 email=email,
                 category=category,
                 message=message,
+                ip_address=ip,
             )
             admin_email = getattr(settings, 'ADMIN_NOTIFY_EMAIL', None) or settings.DEFAULT_FROM_EMAIL
             send_mail(
