@@ -213,56 +213,93 @@ def job_application_action(request, pk):
         app.status = 'approved'
         app.save()
 
-        # メールアドレスでユーザーを検索して権限付与
-        try:
-            from django.core.mail import send_mail
-            from django.conf import settings as django_settings
-            user = User.objects.get(email=app.email)
+        from django.core.mail import send_mail
+        from django.conf import settings as django_settings
+        from django.contrib.auth.tokens import default_token_generator
+        from django.utils.http import urlsafe_base64_encode
+        from django.utils.encoding import force_bytes
+
+        # アカウントが存在しなければ自動作成（is_hospital_admin=True で作成）
+        user, created = User.objects.get_or_create(
+            email=app.email,
+            defaults={'is_hospital_admin': True},
+        )
+        if created:
+            user.set_unusable_password()
+            user.save()
+        else:
             user.is_hospital_admin = True
             user.save(update_fields=['is_hospital_admin'])
 
-            # 手動選択した病院を優先、なければ申請時選択、なければ施設名で部分一致
-            hospital_id = request.POST.get('hospital_id')
-            if hospital_id:
-                hospital = Hospital.objects.filter(pk=hospital_id).first()
-            elif app.hospital:
-                hospital = app.hospital
-            else:
-                hospital = Hospital.objects.filter(name__icontains=app.facility_name).first()
+        # 手動選択した病院を優先、なければ申請時選択、なければ施設名で部分一致
+        hospital_id = request.POST.get('hospital_id')
+        if hospital_id:
+            hospital = Hospital.objects.filter(pk=hospital_id).first()
+        elif app.hospital:
+            hospital = app.hospital
+        else:
+            hospital = Hospital.objects.filter(name__icontains=app.facility_name).first()
 
-            # HospitalAdminProfile を作成または更新
-            profile, _ = HospitalAdminProfile.objects.get_or_create(user=user)
-            if hospital and not profile.hospital:
-                profile.hospital = hospital
-                profile.save(update_fields=['hospital'])
+        # HospitalAdminProfile を作成または更新
+        profile, _ = HospitalAdminProfile.objects.get_or_create(user=user)
+        if hospital and not profile.hospital:
+            profile.hospital = hospital
+            profile.save(update_fields=['hospital'])
 
-            # 承認メールを送信
-            send_mail(
-                subject='【げんばカルテ】掲載申請が承認されました',
-                message=f"""{app.contact_name} 様
+        # パスワード設定用URL生成（allauth形式: /accounts/password/reset/key/{uid}-{token}/）
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        setup_url = f"{django_settings.SITE_URL}/accounts/password/reset/key/{uid}-{token}/"
+
+        # 承認メール送信
+        if created:
+            mail_body = f"""{app.contact_name} 様
 
 この度は「げんばカルテ」への掲載申請をいただきありがとうございます。
 審査の結果、「{app.facility_name}」の掲載申請が承認されました。
 
-以下のURLからログインし、掲載プランをお選びください。
-ダッシュボード: {django_settings.SITE_URL}/jobs/dashboard/
+アカウント（{app.email}）を作成しました。
+以下のURLからパスワードを設定してください（24時間有効）:
+{setup_url}
 
-プランは月額1,000円（税別）または年額10,000円（税別）からお選びいただけます。
-プランへの加入が完了すると、求人情報の掲載が開始されます。
+パスワード設定後、ダッシュボードからプランをお選びください。
+プランは月額1,000円（税別）または年額10,000円（税別）です。
 
 ご不明な点はお問い合わせフォームよりご連絡ください。
 {django_settings.SITE_URL}/contact/
 
 げんばカルテ 運営事務局
-""",
-                from_email=django_settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[app.email],
-                fail_silently=True,
-            )
+"""
+        else:
+            mail_body = f"""{app.contact_name} 様
 
-            messages.success(request, f'「{app.facility_name}」を承認しました。ユーザー（{app.email}）に病院管理者権限を付与し、承認メールを送信しました。')
-        except User.DoesNotExist:
-            messages.warning(request, f'「{app.facility_name}」を承認しました。ただし {app.email} のアカウントが見つかりません。先に会員登録してもらう必要があります。')
+この度は「げんばカルテ」への掲載申請をいただきありがとうございます。
+審査の結果、「{app.facility_name}」の掲載申請が承認されました。
+
+ご登録のアカウント（{app.email}）に病院管理者権限を付与しました。
+以下のURLからログインし、掲載プランをお選びください。
+ダッシュボード: {django_settings.SITE_URL}/jobs/dashboard/
+
+プランは月額1,000円（税別）または年額10,000円（税別）です。
+
+ご不明な点はお問い合わせフォームよりご連絡ください。
+{django_settings.SITE_URL}/contact/
+
+げんばカルテ 運営事務局
+"""
+
+        send_mail(
+            subject='【げんばカルテ】掲載申請が承認されました',
+            message=mail_body,
+            from_email=django_settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[app.email],
+            fail_silently=True,
+        )
+
+        if created:
+            messages.success(request, f'「{app.facility_name}」を承認しました。アカウントを自動作成し、パスワード設定メールを {app.email} に送信しました。')
+        else:
+            messages.success(request, f'「{app.facility_name}」を承認しました。{app.email} に病院管理者権限を付与し、承認メールを送信しました。')
 
     elif action == 'relink':
         hospital_id = request.POST.get('hospital_id')
