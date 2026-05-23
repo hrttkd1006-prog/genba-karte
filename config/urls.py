@@ -4,11 +4,12 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.sitemaps.views import sitemap
 from django.views.generic import TemplateView
-from hospitals.sitemaps import HospitalSitemap, StaticSitemap
+from hospitals.sitemaps import HospitalSitemap, ArticleSitemap, StaticSitemap
 from two_factor.urls import core as tf_core, profile as tf_profile
 
 sitemaps = {
     'hospitals': HospitalSitemap,
+    'articles': ArticleSitemap,
     'static': StaticSitemap,
 }
 
