@@ -23,6 +23,11 @@ def _get_client_ip(request):
 def review_create(request, hospital_pk):
     hospital = get_object_or_404(Hospital, pk=hospital_pk)
 
+    # 病院管理者はレビュー投稿不可（利益相反防止）
+    if request.user.is_hospital_admin:
+        messages.error(request, '病院・施設の管理者アカウントではレビューを投稿できません。')
+        return redirect('hospital_detail', hospital.pk)
+
     if Review.objects.filter(hospital=hospital, user=request.user).exists():
         messages.warning(request, 'この施設にはすでにレビューを投稿済みです。')
         return redirect('hospital_detail', hospital.pk)
@@ -103,6 +108,11 @@ def review_create(request, hospital_pk):
 @login_required
 def review_edit(request, pk):
     review = get_object_or_404(Review, pk=pk, user=request.user)
+
+    # 病院管理者はレビュー編集不可
+    if request.user.is_hospital_admin:
+        messages.error(request, '病院・施設の管理者アカウントではレビューを編集できません。')
+        return redirect('profile')
 
     # 審査中・確認中は編集不可
     if review.status in ('objection',):

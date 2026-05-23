@@ -103,7 +103,7 @@ def hospital_register(request):
     return render(request, 'jobs/hospital_register.html', {'form': form})
 
 
-@login_required
+@hospital_admin_required
 def hospital_admin_apply(request):
     """病院管理者として施設との紐付けを申請するフォーム。"""
     # すでに紐付け済みならダッシュボードへ
