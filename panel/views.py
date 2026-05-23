@@ -478,7 +478,47 @@ def user_action(request, pk):
         target.is_active = True
         target.save()
         messages.success(request, f'{target.email} を有効化しました。')
+    elif action == 'delete':
+        email = target.email
+        target.delete()
+        messages.warning(request, f'{email} を削除しました。')
     return redirect('panel_users')
+
+
+# ── 求人管理 ──────────────────────────────────────────
+
+@staff_required
+def job_posts_panel(request):
+    from jobs.models import JobPost
+    items = JobPost.objects.select_related('hospital', 'created_by').order_by('-created_at')
+    keyword = request.GET.get('keyword', '')
+    if keyword:
+        items = items.filter(hospital__name__icontains=keyword)
+    return render(request, 'panel/job_posts.html', {
+        'items': items,
+        'keyword': keyword,
+    })
+
+
+@staff_required
+@require_POST
+def job_post_action(request, pk):
+    from jobs.models import JobPost
+    job = get_object_or_404(JobPost, pk=pk)
+    action = request.POST.get('action')
+    if action == 'delete':
+        title = job.title
+        job.delete()
+        messages.warning(request, f'「{title}」を削除しました。')
+    elif action == 'deactivate':
+        job.is_active = False
+        job.save()
+        messages.warning(request, f'「{job.title}」を非公開にしました。')
+    elif action == 'activate':
+        job.is_active = True
+        job.save()
+        messages.success(request, f'「{job.title}」を公開しました。')
+    return redirect('panel_job_posts')
 
 
 # ── サーバーログ ──────────────────────────────────────────

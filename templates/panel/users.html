@@ -49,16 +49,24 @@
         </td>
         <td>
           {% if not u.is_staff %}
-          <form method="post" action="{% url 'panel_user_action' u.pk %}">
-            {% csrf_token %}
-            {% if u.is_active %}
-              <input type="hidden" name="action" value="deactivate">
-              <button class="btn btn-sm btn-outline-danger">停止</button>
-            {% else %}
-              <input type="hidden" name="action" value="activate">
-              <button class="btn btn-sm btn-outline-success">有効化</button>
-            {% endif %}
-          </form>
+          <div class="d-flex gap-1">
+            <form method="post" action="{% url 'panel_user_action' u.pk %}">
+              {% csrf_token %}
+              {% if u.is_active %}
+                <input type="hidden" name="action" value="deactivate">
+                <button class="btn btn-sm btn-outline-warning">停止</button>
+              {% else %}
+                <input type="hidden" name="action" value="activate">
+                <button class="btn btn-sm btn-outline-success">有効化</button>
+              {% endif %}
+            </form>
+            <form method="post" action="{% url 'panel_user_action' u.pk %}"
+                  onsubmit="return confirm('{{ u.email }} を完全に削除しますか？この操作は取り消せません。')">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="delete">
+              <button class="btn btn-sm btn-danger">削除</button>
+            </form>
+          </div>
           {% endif %}
         </td>
       </tr>

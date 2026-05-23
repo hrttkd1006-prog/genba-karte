@@ -22,5 +22,7 @@ urlpatterns = [
     path('articles/create/', views.article_create, name='panel_article_create'),
     path('articles/<int:pk>/edit/', views.article_edit, name='panel_article_edit'),
     path('articles/<int:pk>/delete/', views.article_delete, name='panel_article_delete'),
+    path('job-posts/', views.job_posts_panel, name='panel_job_posts'),
+    path('job-posts/<int:pk>/action/', views.job_post_action, name='panel_job_post_action'),
     path('server-logs/', views.server_logs, name='panel_server_logs'),
 ]

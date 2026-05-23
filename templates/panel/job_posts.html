@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}求人管理 | 管理{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h4 fw-bold mb-0"><i class="bi bi-briefcase text-primary"></i> 求人管理</h1>
+  <a href="{% url 'panel_dashboard' %}" class="btn btn-sm btn-outline-secondary">ダッシュボードへ</a>
+</div>
+
+<form method="get" class="mb-3 d-flex gap-2">
+  <input type="text" name="keyword" value="{{ keyword }}" placeholder="施設名で検索" class="form-control form-control-sm" style="max-width:300px;">
+  <button type="submit" class="btn btn-sm btn-primary">検索</button>
+  {% if keyword %}<a href="?" class="btn btn-sm btn-outline-secondary">クリア</a>{% endif %}
+</form>
+
+{% if messages %}
+  {% for msg in messages %}
+    <div class="alert alert-{{ msg.tags }} alert-dismissible fade show">
+      {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+
+{% if items %}
+<div class="table-responsive">
+  <table class="table table-hover align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>施設名</th>
+        <th>求人タイトル</th>
+        <th>投稿者</th>
+        <th>投稿日</th>
+        <th>状態</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for job in items %}
+      <tr>
+        <td class="small">{{ job.hospital.name }}</td>
+        <td class="small">{{ job.title }}</td>
+        <td class="small text-muted">{{ job.created_by.email|default:"-" }}</td>
+        <td class="small text-muted">{{ job.created_at|date:"Y/m/d" }}</td>
+        <td>
+          {% if job.is_active %}
+            <span class="badge bg-success">公開中</span>
+          {% else %}
+            <span class="badge bg-secondary">非公開</span>
+          {% endif %}
+        </td>
+        <td>
+          <div class="d-flex gap-1">
+            <form method="post" action="{% url 'panel_job_post_action' job.pk %}">
+              {% csrf_token %}
+              {% if job.is_active %}
+                <input type="hidden" name="action" value="deactivate">
+                <button class="btn btn-sm btn-outline-warning">非公開</button>
+              {% else %}
+                <input type="hidden" name="action" value="activate">
+                <button class="btn btn-sm btn-outline-success">公開</button>
+              {% endif %}
+            </form>
+            <form method="post" action="{% url 'panel_job_post_action' job.pk %}"
+                  onsubmit="return confirm('「{{ job.title }}」を削除しますか？')">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="delete">
+              <button class="btn btn-sm btn-danger">削除</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="text-muted text-center py-4">求人が見つかりません。</p>
+{% endif %}
+{% endblock %}
