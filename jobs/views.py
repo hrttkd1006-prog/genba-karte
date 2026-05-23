@@ -176,6 +176,10 @@ def job_post_create(request):
         messages.warning(request, '求人を掲載するには掲載プランへの加入が必要です。')
         return redirect('hospital_admin_dashboard')
 
+    if not profile.hospital:
+        messages.error(request, '担当施設が設定されていません。管理者にお問い合わせください。')
+        return redirect('hospital_admin_dashboard')
+
     if request.method == 'POST':
         form = JobPostForm(request.POST)
         if form.is_valid():
@@ -254,13 +258,16 @@ def checkout_success(request):
         try:
             session = stripe.checkout.Session.retrieve(session_id)
             profile, _ = HospitalAdminProfile.objects.get_or_create(user=request.user)
-            profile.stripe_subscription_id = session.subscription
+            plan = session.metadata['plan'] if session.metadata and 'plan' in session.metadata else 'monthly'
+            profile.stripe_subscription_id = str(session.subscription)
             profile.subscription_status = 'active'
-            profile.subscription_plan = session.metadata.get('plan', 'monthly')
+            profile.subscription_plan = plan
             profile.save()
             messages.success(request, '掲載プランへの加入が完了しました。求人情報を登録できます。')
-        except stripe.StripeError:
-            pass
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).error(f'checkout_success error: {e}')
+            messages.error(request, '処理中にエラーが発生しました。管理者にお問い合わせください。')
     return redirect('hospital_admin_dashboard')
 
 

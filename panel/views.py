@@ -10,6 +10,9 @@ def staff_required(view_func):
     def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated or not request.user.is_staff:
             return redirect('account_login')
+        if not request.user.is_verified():
+            from two_factor.views import LoginView
+            return redirect('two_factor:login')
         return view_func(request, *args, **kwargs)
     wrapper.__name__ = view_func.__name__
     return wrapper
@@ -56,6 +59,8 @@ def facility_request_action(request, pk):
     action = request.POST.get('action')
 
     if action == 'approve' and req.status in ('pending', 'needs_review'):
+        from django.core.mail import send_mail
+        from django.conf import settings as django_settings
         hospital = Hospital.objects.create(
             name=req.facility_name,
             prefecture=req.prefecture,
@@ -97,6 +102,23 @@ def facility_request_action(request, pk):
             )
         req.status = 'approved'
         req.save()
+        if req.user:
+            send_mail(
+                subject='【げんばカルテ】施設登録申請が承認されました',
+                message=f"""この度は「げんばカルテ」への施設登録申請をいただきありがとうございます。
+審査の結果、「{req.facility_name}」の登録が承認され、口コミが公開されました。
+
+施設ページはこちらからご確認いただけます。
+{django_settings.SITE_URL}/hospitals/{hospital.pk}/
+
+今後ともげんばカルテをよろしくお願いいたします。
+
+げんばカルテ 運営事務局
+""",
+                from_email=django_settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[req.user.email],
+                fail_silently=True,
+            )
         messages.success(request, f'「{req.facility_name}」を承認しました。')
 
     elif action == 'needs_review':
@@ -105,8 +127,25 @@ def facility_request_action(request, pk):
         messages.info(request, f'「{req.facility_name}」を要確認にしました。')
 
     elif action == 'reject':
+        from django.core.mail import send_mail
+        from django.conf import settings as django_settings
         req.status = 'rejected'
         req.save()
+        if req.user:
+            send_mail(
+                subject='【げんばカルテ】施設登録申請について',
+                message=f"""この度は「げんばカルテ」への施設登録申請をいただきありがとうございます。
+審査の結果、「{req.facility_name}」の登録申請については、今回は見送りとさせていただきました。
+
+ご不明な点はお問い合わせフォームよりご連絡ください。
+{django_settings.SITE_URL}/contact/
+
+げんばカルテ 運営事務局
+""",
+                from_email=django_settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[req.user.email],
+                fail_silently=True,
+            )
         messages.warning(request, f'「{req.facility_name}」を却下しました。')
 
     return redirect('panel_facility_requests')
@@ -149,29 +188,124 @@ def contact_mark_read(request, pk):
 @staff_required
 def job_applications(request):
     from jobs.models import HospitalAdminApplication
-    items = HospitalAdminApplication.objects.order_by('-created_at')
+    from hospitals.models import Hospital
+    items = HospitalAdminApplication.objects.select_related('hospital').order_by('-created_at')
     status_filter = request.GET.get('status', 'pending')
     if status_filter:
         items = items.filter(status=status_filter)
+    hospitals = Hospital.objects.order_by('prefecture', 'name')
     return render(request, 'panel/job_applications.html', {
         'items': items,
         'status_filter': status_filter,
+        'hospitals': hospitals,
     })
 
 
 @staff_required
 @require_POST
 def job_application_action(request, pk):
-    from jobs.models import HospitalAdminApplication
+    from jobs.models import HospitalAdminApplication, HospitalAdminProfile
+    from hospitals.models import Hospital
+    from accounts.models import User
     app = get_object_or_404(HospitalAdminApplication, pk=pk)
     action = request.POST.get('action')
     if action == 'approve':
         app.status = 'approved'
         app.save()
-        messages.success(request, f'「{app.facility_name}」の申請を承認しました。')
+
+        # メールアドレスでユーザーを検索して権限付与
+        try:
+            from django.core.mail import send_mail
+            from django.conf import settings as django_settings
+            user = User.objects.get(email=app.email)
+            user.is_hospital_admin = True
+            user.save(update_fields=['is_hospital_admin'])
+
+            # 手動選択した病院を優先、なければ申請時選択、なければ施設名で部分一致
+            hospital_id = request.POST.get('hospital_id')
+            if hospital_id:
+                hospital = Hospital.objects.filter(pk=hospital_id).first()
+            elif app.hospital:
+                hospital = app.hospital
+            else:
+                hospital = Hospital.objects.filter(name__icontains=app.facility_name).first()
+
+            # HospitalAdminProfile を作成または更新
+            profile, _ = HospitalAdminProfile.objects.get_or_create(user=user)
+            if hospital and not profile.hospital:
+                profile.hospital = hospital
+                profile.save(update_fields=['hospital'])
+
+            # 承認メールを送信
+            send_mail(
+                subject='【げんばカルテ】掲載申請が承認されました',
+                message=f"""{app.contact_name} 様
+
+この度は「げんばカルテ」への掲載申請をいただきありがとうございます。
+審査の結果、「{app.facility_name}」の掲載申請が承認されました。
+
+以下のURLからログインし、掲載プランをお選びください。
+ダッシュボード: {django_settings.SITE_URL}/jobs/dashboard/
+
+プランは月額1,000円（税別）または年額10,000円（税別）からお選びいただけます。
+プランへの加入が完了すると、求人情報の掲載が開始されます。
+
+ご不明な点はお問い合わせフォームよりご連絡ください。
+{django_settings.SITE_URL}/contact/
+
+げんばカルテ 運営事務局
+""",
+                from_email=django_settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[app.email],
+                fail_silently=True,
+            )
+
+            messages.success(request, f'「{app.facility_name}」を承認しました。ユーザー（{app.email}）に病院管理者権限を付与し、承認メールを送信しました。')
+        except User.DoesNotExist:
+            messages.warning(request, f'「{app.facility_name}」を承認しました。ただし {app.email} のアカウントが見つかりません。先に会員登録してもらう必要があります。')
+
+    elif action == 'relink':
+        hospital_id = request.POST.get('hospital_id')
+        if hospital_id:
+            hospital = Hospital.objects.filter(pk=hospital_id).first()
+            if hospital:
+                app.hospital = hospital
+                app.save(update_fields=['hospital'])
+                try:
+                    from accounts.models import User
+                    user = User.objects.get(email=app.email)
+                    profile, _ = HospitalAdminProfile.objects.get_or_create(user=user)
+                    profile.hospital = hospital
+                    profile.save(update_fields=['hospital'])
+                    messages.success(request, f'「{app.facility_name}」の担当施設を「{hospital.name}」に更新しました。')
+                except User.DoesNotExist:
+                    messages.warning(request, f'申請の病院は更新しましたが、ユーザーが見つかりません。')
+            else:
+                messages.error(request, '病院が見つかりませんでした。')
+        else:
+            messages.error(request, '病院を選択してください。')
+
     elif action == 'reject':
+        from django.core.mail import send_mail
+        from django.conf import settings as django_settings
         app.status = 'rejected'
         app.save()
+        send_mail(
+            subject='【げんばカルテ】掲載申請について',
+            message=f"""{app.contact_name} 様
+
+この度は「げんばカルテ」への掲載申請をいただきありがとうございます。
+審査の結果、今回は掲載申請を見送りとさせていただきました。
+
+ご不明な点はお問い合わせフォームよりご連絡ください。
+{django_settings.SITE_URL}/contact/
+
+げんばカルテ 運営事務局
+""",
+            from_email=django_settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[app.email],
+            fail_silently=True,
+        )
         messages.warning(request, f'「{app.facility_name}」の申請を却下しました。')
     return redirect('panel_job_applications')
 

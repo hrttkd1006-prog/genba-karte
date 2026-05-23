@@ -63,6 +63,10 @@ APPLICATION_STATUS_CHOICES = [
 
 class HospitalAdminApplication(models.Model):
     facility_name = models.CharField('施設名', max_length=200)
+    hospital = models.ForeignKey(
+        'hospitals.Hospital', on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='admin_applications', verbose_name='紐づけ病院'
+    )
     contact_name = models.CharField('担当者名', max_length=100)
     email = models.EmailField('メールアドレス')
     phone = models.CharField('電話番号', max_length=20)

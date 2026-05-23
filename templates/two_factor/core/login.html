@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load two_factor_tags %}
+
+{% block title %}ログイン | げんばカルテ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-sm-8 col-md-5">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h1 class="h4 fw-bold text-center mb-4">ログイン</h1>
+
+        {% if wizard.steps.current == 'token' %}
+          <p class="text-center text-muted small mb-3">認証アプリの6桁のコードを入力してください。</p>
+        {% endif %}
+
+        <form method="post">
+          {% csrf_token %}
+          {{ wizard.management_form }}
+          {% for field in wizard.form %}
+            <div class="mb-3">
+              <label class="form-label">{{ field.label }}</label>
+              <input type="{{ field.field.widget.input_type }}"
+                     name="{{ field.html_name }}"
+                     id="{{ field.auto_id }}"
+                     class="form-control{% if field.errors %} is-invalid{% endif %}"
+                     {% if field.value %}value="{{ field.value }}"{% endif %}
+                     {% if field.field.required %}required{% endif %}>
+              {% for error in field.errors %}
+                <div class="invalid-feedback">{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endfor %}
+
+          <div class="d-grid mt-3">
+            <button type="submit" class="btn btn-primary btn-lg">
+              {% if wizard.steps.current == 'token' %}確認{% else %}ログイン{% endif %}
+            </button>
+          </div>
+        </form>
+
+        {% if wizard.steps.current == 'auth' %}
+        <hr>
+        <p class="text-center small text-muted mb-1">
+          <a href="{% url 'account_reset_password' %}">パスワードをお忘れの方</a>
+        </p>
+        <p class="text-center small text-muted mb-0">
+          アカウントをお持ちでない方は
+          <a href="{% url 'account_signup' %}">無料会員登録</a>
+        </p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 from django.contrib.sitemaps.views import sitemap
 from django.views.generic import TemplateView
 from hospitals.sitemaps import HospitalSitemap, StaticSitemap
+from two_factor.urls import core as tf_core, profile as tf_profile
 
 sitemaps = {
     'hospitals': HospitalSitemap,
@@ -15,6 +16,7 @@ _panel_prefix = getattr(settings, 'PANEL_URL_PREFIX', 'manage-gk2025')
 
 urlpatterns = [
     # path('admin/', admin.site.urls),  # /manage/ に移行のため無効化
+    path('', include((tf_core + tf_profile, 'two_factor'))),
     path('accounts/', include('allauth.urls')),
     path('', include('hospitals.urls')),
     path('reviews/', include('reviews.urls')),

@@ -24,9 +24,16 @@
           {% if hospital.beds %}<span><i class="bi bi-hospital"></i> {{ hospital.beds }}床</span>{% endif %}
           {% if hospital.technician_count %}<span><i class="bi bi-people"></i> 技師 約{{ hospital.technician_count }}名</span>{% endif %}
           {% if hospital.website %}
-            <a href="{{ hospital.website }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
-              <i class="bi bi-globe"></i> 公式サイト
-            </a>
+            <span class="d-inline-flex align-items-center gap-1">
+              <a href="{{ hospital.website }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                <i class="bi bi-globe"></i> 公式サイト
+              </a>
+              <button type="button" class="btn btn-link btn-sm p-0 text-muted"
+                onclick="navigator.clipboard.writeText('{{ hospital.website }}').then(()=>{this.title='コピーしました！';setTimeout(()=>{this.title='URLをコピー'},1500)})"
+                title="URLをコピー" style="font-size:.75rem;">
+                <i class="bi bi-clipboard"></i>
+              </button>
+            </span>
           {% endif %}
         </div>
       </div>
@@ -343,10 +350,10 @@
       <div class="card-body">
         <h6 class="fw-bold mb-2"><i class="bi bi-briefcase-fill text-primary"></i> 転職を検討中の方へ</h6>
         <p class="small text-muted mb-3">臨床検査技師専門の転職サポートを活用しよう</p>
-        <a href="#" rel="sponsored" class="btn btn-warning btn-sm w-100 mb-2">
+        <a href="https://mt-worker.com/" target="_blank" rel="noopener sponsored" class="btn btn-warning btn-sm w-100 mb-2">
           メディカル技師ワーカーで探す
         </a>
-        <a href="#" rel="sponsored" class="btn btn-outline-primary btn-sm w-100">
+        <a href="https://iryogishi-oshigoto.jp/" target="_blank" rel="noopener sponsored" class="btn btn-outline-primary btn-sm w-100">
           レバウェル医療技師で探す
         </a>
       </div>

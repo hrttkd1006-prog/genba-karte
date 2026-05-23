@@ -13,6 +13,33 @@
     <h1 class="h4 fw-bold mb-1">掲載申し込みフォーム</h1>
     <p class="text-muted small mb-4">審査・初期費用は無料です。承認後にプランをご契約ください。</p>
 
+    {% if not user.is_authenticated %}
+    <!-- 未ログイン向け登録案内 -->
+    <div class="card border-primary mb-4">
+      <div class="card-body">
+        <div class="d-flex align-items-start gap-3">
+          <div class="fs-2 flex-shrink-0">👤</div>
+          <div>
+            <h2 class="h6 fw-bold mb-1">申し込みの前に会員登録が必要です</h2>
+            <p class="small text-muted mb-3">承認後にダッシュボードへアクセスするため、申し込みと同じメールアドレスで会員登録をお願いします。</p>
+            <div class="d-flex gap-2 flex-wrap">
+              <a href="{% url 'account_signup' %}?next={{ request.path }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-person-plus"></i> 無料で会員登録する
+              </a>
+              <a href="{% url 'account_login' %}?next={{ request.path }}" class="btn btn-outline-secondary btn-sm">
+                すでに登録済みの方はこちら
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="alert alert-success small py-2 mb-4">
+      <i class="bi bi-check-circle"></i> <strong>{{ user.email }}</strong> でログイン中です。このメールアドレスで申し込みください。
+    </div>
+    {% endif %}
+
     <!-- 料金案内 -->
     <div class="card bg-light border-0 mb-4">
       <div class="card-body">
@@ -97,4 +124,23 @@
     </p>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const hospitalSelect = document.getElementById('id_hospital');
+  const facilityNameInput = document.getElementById('id_facility_name');
+  if (!hospitalSelect || !facilityNameInput) return;
+
+  hospitalSelect.addEventListener('change', function () {
+    const selectedOption = this.options[this.selectedIndex];
+    if (selectedOption.value) {
+      facilityNameInput.value = selectedOption.text.trim();
+    } else {
+      facilityNameInput.value = '';
+    }
+  });
+});
+</script>
 {% endblock %}

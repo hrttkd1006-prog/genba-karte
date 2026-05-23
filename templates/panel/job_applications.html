@@ -56,16 +56,34 @@
         </td>
         <td>
           {% if item.status == 'pending' %}
-          <div class="d-flex gap-1">
-            <form method="post" action="{% url 'panel_job_application_action' item.pk %}">
-              {% csrf_token %}<input type="hidden" name="action" value="approve">
-              <button class="btn btn-sm btn-success">承認</button>
-            </form>
-            <form method="post" action="{% url 'panel_job_application_action' item.pk %}">
-              {% csrf_token %}<input type="hidden" name="action" value="reject">
-              <button class="btn btn-sm btn-outline-danger">却下</button>
-            </form>
-          </div>
+          <form method="post" action="{% url 'panel_job_application_action' item.pk %}">
+            {% csrf_token %}
+            <div class="mb-1">
+              <select name="hospital_id" class="form-select form-select-sm" style="min-width:180px;">
+                <option value="">--- 病院を選択（任意）---</option>
+                {% for h in hospitals %}
+                <option value="{{ h.pk }}" {% if item.hospital_id == h.pk %}selected{% endif %}>{{ h.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="d-flex gap-1">
+              <button name="action" value="approve" class="btn btn-sm btn-success">承認</button>
+              <button name="action" value="reject" class="btn btn-sm btn-outline-danger">却下</button>
+            </div>
+          </form>
+          {% elif item.status == 'approved' %}
+          <form method="post" action="{% url 'panel_job_application_action' item.pk %}">
+            {% csrf_token %}
+            <div class="mb-1">
+              <select name="hospital_id" class="form-select form-select-sm" style="min-width:180px;">
+                <option value="">--- 病院を選択 ---</option>
+                {% for h in hospitals %}
+                <option value="{{ h.pk }}" {% if item.hospital_id == h.pk %}selected{% endif %}>{{ h.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <button name="action" value="relink" class="btn btn-sm btn-outline-primary">病院を更新</button>
+          </form>
           {% endif %}
         </td>
       </tr>

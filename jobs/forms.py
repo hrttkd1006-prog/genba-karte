@@ -4,6 +4,14 @@ from hospitals.models import Hospital
 
 
 class HospitalRegisterForm(forms.ModelForm):
+    hospital = forms.ModelChoiceField(
+        queryset=Hospital.objects.all().order_by('prefecture', 'name'),
+        label='施設名（既存から選択）',
+        required=False,
+        empty_label='--- DBから検索して選択（任意）---',
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        help_text='一覧にある施設はここから選ぶと紐づけがスムーズです。新規の場合は下の「施設名」欄に入力してください。',
+    )
     agreed_to_terms = forms.BooleanField(
         label='利用規約・プライバシーポリシーに同意する',
         error_messages={'required': '利用規約への同意が必要です。'},
@@ -17,21 +25,36 @@ class HospitalRegisterForm(forms.ModelForm):
 
     class Meta:
         model = HospitalAdminApplication
-        fields = ['facility_name', 'contact_name', 'email', 'phone', 'official_url', 'message', 'agreed_to_terms']
+        fields = ['hospital', 'facility_name', 'contact_name', 'email', 'phone', 'official_url', 'message', 'agreed_to_terms']
         labels = {
-            'facility_name': '施設名',
+            'facility_name': '施設名（DBにない場合は直接入力）',
             'contact_name': '担当者名',
             'email': 'メールアドレス',
             'official_url': '施設の公式サイトURL',
             'message': 'その他ご要望・備考（任意）',
         }
         widgets = {
-            'facility_name': forms.TextInput(attrs={'placeholder': '例：○○大学病院 検査部'}),
+            'facility_name': forms.TextInput(attrs={'placeholder': '例：○○大学病院 検査部（上で選択した場合は不要）'}),
             'contact_name': forms.TextInput(attrs={'placeholder': '例：山田 太郎'}),
             'email': forms.EmailInput(attrs={'placeholder': 'example@hospital.jp'}),
             'official_url': forms.URLInput(attrs={'placeholder': 'https://www.example-hospital.jp'}),
             'message': forms.Textarea(attrs={'rows': 3}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['facility_name'].required = False
+
+    def clean(self):
+        cleaned = super().clean()
+        hospital = cleaned.get('hospital')
+        facility_name = cleaned.get('facility_name', '').strip()
+        if not hospital and not facility_name:
+            raise forms.ValidationError('施設を選択するか、施設名を直接入力してください。')
+        # 病院をDBから選んだ場合は施設名を自動セット
+        if hospital and not facility_name:
+            cleaned['facility_name'] = hospital.name
+        return cleaned
 
 
 class HospitalAdminApplyForm(forms.Form):
