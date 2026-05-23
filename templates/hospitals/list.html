@@ -11,8 +11,9 @@
 <div class="card mb-4">
   <div class="card-body">
     <form method="get" class="row g-2">
-      <div class="col-12 col-md-4">
-        <input type="text" name="keyword" value="{{ keyword }}" placeholder="施設名・住所で検索" class="form-control">
+      <div class="col-12 col-md-4 position-relative">
+        <input type="text" name="keyword" id="hospitalSearch" value="{{ keyword }}" placeholder="施設名・住所で検索" class="form-control" autocomplete="off">
+        <ul id="autocompleteList" class="list-group position-absolute w-100 shadow-sm" style="z-index:1000; display:none; top:100%; left:0;"></ul>
       </div>
       <div class="col-6 col-md-3">
         <select name="prefecture" class="form-select">
@@ -107,4 +108,70 @@
 </div>
 {% endif %}
 
+{% if page_obj.has_other_pages %}
+<nav class="mt-4 d-flex justify-content-center">
+  <ul class="pagination">
+    {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}&prefecture={{ selected_prefecture }}&keyword={{ keyword }}&facility_type={{ facility_type }}&sort={{ sort }}">前へ</a>
+      </li>
+    {% endif %}
+    {% for num in page_obj.paginator.page_range %}
+      {% if page_obj.number == num %}
+        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+      {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+        <li class="page-item"><a class="page-link" href="?page={{ num }}&prefecture={{ selected_prefecture }}&keyword={{ keyword }}&facility_type={{ facility_type }}&sort={{ sort }}">{{ num }}</a></li>
+      {% endif %}
+    {% endfor %}
+    {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}&prefecture={{ selected_prefecture }}&keyword={{ keyword }}&facility_type={{ facility_type }}&sort={{ sort }}">次へ</a>
+      </li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+  const input = document.getElementById('hospitalSearch');
+  const list = document.getElementById('autocompleteList');
+  if (!input || !list) return;
+
+  let timer;
+  input.addEventListener('input', function() {
+    clearTimeout(timer);
+    const q = this.value.trim();
+    if (q.length < 1) { list.style.display = 'none'; return; }
+    timer = setTimeout(function() {
+      fetch('/hospitals/autocomplete/?q=' + encodeURIComponent(q))
+        .then(r => r.json())
+        .then(data => {
+          list.innerHTML = '';
+          if (data.length === 0) { list.style.display = 'none'; return; }
+          data.forEach(function(item) {
+            const li = document.createElement('li');
+            li.className = 'list-group-item list-group-item-action small';
+            li.style.cursor = 'pointer';
+            li.textContent = item.name + '（' + item.prefecture + '）';
+            li.addEventListener('click', function() {
+              input.value = item.name;
+              list.style.display = 'none';
+              input.form.submit();
+            });
+            list.appendChild(li);
+          });
+          list.style.display = 'block';
+        });
+    }, 200);
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!input.contains(e.target)) list.style.display = 'none';
+  });
+})();
+</script>
 {% endblock %}

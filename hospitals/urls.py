@@ -10,4 +10,5 @@ urlpatterns = [
     path('hospitals/favorites/', views.favorite_list, name='favorite_list'),
     path('hospitals/<int:pk>/', views.hospital_detail, name='hospital_detail'),
     path('hospitals/<int:pk>/favorite/', views.toggle_favorite, name='toggle_favorite'),
+    path('hospitals/autocomplete/', views.hospital_autocomplete, name='hospital_autocomplete'),
 ]

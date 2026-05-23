@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.db.models import Avg, Count, Q
 from .models import Hospital, Favorite, PREFECTURE_CHOICES
 
@@ -30,8 +31,13 @@ def hospital_list(request):
     else:
         hospitals = hospitals.order_by('-review_count', 'name')
 
+    paginator = Paginator(hospitals, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     return render(request, 'hospitals/list.html', {
-        'hospitals': hospitals,
+        'hospitals': page_obj,
+        'page_obj': page_obj,
         'prefectures': PREFECTURE_CHOICES,
         'selected_prefecture': prefecture,
         'keyword': keyword,
@@ -71,6 +77,17 @@ def toggle_favorite(request, pk):
 def favorite_list(request):
     favorites = Favorite.objects.filter(user=request.user).select_related('hospital').order_by('-created_at')
     return render(request, 'hospitals/favorites.html', {'favorites': favorites})
+
+
+def hospital_autocomplete(request):
+    from django.http import JsonResponse
+    q = request.GET.get('q', '').strip()
+    if len(q) < 1:
+        return JsonResponse([], safe=False)
+    results = Hospital.objects.filter(
+        Q(name__icontains=q) | Q(address__icontains=q)
+    ).values('id', 'name', 'prefecture')[:10]
+    return JsonResponse(list(results), safe=False)
 
 
 def hospital_map(request):
@@ -136,6 +153,13 @@ def hospital_detail(request, pk):
             user=request.user, review__in=reviews
         ).values_list('review_id', flat=True))
 
+    related_hospitals = Hospital.objects.filter(
+        prefecture=hospital.prefecture
+    ).exclude(pk=hospital.pk).annotate(
+        review_count=Count('reviews', filter=Q(reviews__status='approved')),
+        avg_rating=Avg('reviews__overall_rating', filter=Q(reviews__status='approved')),
+    ).order_by('-review_count')[:5]
+
     return render(request, 'hospitals/detail.html', {
         'hospital': hospital,
         'reviews': reviews,
@@ -147,4 +171,5 @@ def hospital_detail(request, pk):
         'is_favorite': is_favorite,
         'sort': sort,
         'helpful_ids': helpful_ids,
+        'related_hospitals': related_hospitals,
     })

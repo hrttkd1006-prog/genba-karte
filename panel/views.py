@@ -374,14 +374,50 @@ def review_action(request, pk):
     from reviews.models import Review
     review = get_object_or_404(Review, pk=pk)
     action = request.POST.get('action')
+    from django.core.mail import send_mail
+    from django.conf import settings as django_settings
     if action == 'approve':
         review.status = 'approved'
         review.save()
+        if review.user and review.user.email:
+            send_mail(
+                subject='【げんばカルテ】レビューが公開されました',
+                message=f"""レビューが審査を通過し、公開されました。
+
+■ 施設名: {review.hospital.name}
+
+ご協力いただきありがとうございます。
+施設ページはこちらからご確認いただけます。
+{django_settings.SITE_URL}/hospitals/{review.hospital.pk}/
+
+げんばカルテ 運営チーム
+""",
+                from_email=django_settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[review.user.email],
+                fail_silently=True,
+            )
         messages.success(request, 'レビューを承認しました。')
     elif action == 'reject':
         review.status = 'rejected'
         review.reject_reason = request.POST.get('reject_reason', '').strip()
         review.save()
+        if review.user and review.user.email:
+            send_mail(
+                subject='【げんばカルテ】レビューについてのお知らせ',
+                message=f"""投稿いただいたレビューについて、審査の結果、今回は掲載を見送らせていただきました。
+
+■ 施設名: {review.hospital.name}
+{f"■ 理由: {review.reject_reason}" if review.reject_reason else ""}
+
+ご不明な点はお問い合わせフォームよりご連絡ください。
+{django_settings.SITE_URL}/contact/
+
+げんばカルテ 運営チーム
+""",
+                from_email=django_settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[review.user.email],
+                fail_silently=True,
+            )
         messages.warning(request, 'レビューを却下しました。')
     elif action == 'delete':
         review.delete()

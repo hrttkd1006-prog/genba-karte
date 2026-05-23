@@ -101,6 +101,44 @@ def review_create(request, hospital_pk):
 
 
 @login_required
+def review_edit(request, pk):
+    review = get_object_or_404(Review, pk=pk, user=request.user)
+
+    # 審査中・確認中は編集不可
+    if review.status in ('objection',):
+        messages.warning(request, '確認中のレビューは編集できません。')
+        return redirect('profile')
+
+    if request.method == 'POST':
+        form = ReviewForm(request.POST, instance=review)
+        if form.is_valid():
+            updated = form.save(commit=False)
+            review_text = build_review_text(updated)
+            ip = _get_client_ip(request)
+            ai_result = moderate_review(review_text, ip)
+            updated.ai_judgment = ai_result['judgment']
+            updated.ai_reason = ai_result['reason']
+            if ai_result['judgment'] == 'black':
+                updated.status = 'rejected'
+                updated.reject_reason = ai_result['reason']
+            elif ai_result['judgment'] == 'white':
+                updated.status = 'approved'
+            else:
+                updated.status = 'pending'
+            updated.save()
+            messages.success(request, 'レビューを更新しました。')
+            return redirect('profile')
+    else:
+        form = ReviewForm(instance=review)
+
+    return render(request, 'reviews/edit.html', {
+        'form': form,
+        'review': review,
+        'hospital': review.hospital,
+    })
+
+
+@login_required
 def review_delete(request, pk):
     review = get_object_or_404(Review, pk=pk, user=request.user)
     if request.method == 'POST':
