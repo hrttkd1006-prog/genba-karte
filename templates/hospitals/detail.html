@@ -287,7 +287,7 @@
                 <a href="{% url 'account_signup' %}?next={{ request.path }}" class="btn btn-primary btn-sm me-1">
                   <i class="bi bi-person-plus"></i> 無料登録
                 </a>
-                <a href="{% url 'account_login' %}?next={{ request.path }}" class="btn btn-outline-secondary btn-sm">
+                <a href="{% url 'two_factor:login' %}?next={{ request.path }}" class="btn btn-outline-secondary btn-sm">
                   ログイン
                 </a>
               </div>
@@ -309,7 +309,7 @@
         <a href="{% url 'account_signup' %}?next={{ request.path }}" class="btn btn-primary me-2">
           <i class="bi bi-person-plus"></i> 無料登録
         </a>
-        <a href="{% url 'account_login' %}?next={{ request.path }}" class="btn btn-outline-secondary">
+        <a href="{% url 'two_factor:login' %}?next={{ request.path }}" class="btn btn-outline-secondary">
           ログイン
         </a>
       </div>
