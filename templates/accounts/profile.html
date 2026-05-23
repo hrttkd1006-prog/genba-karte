@@ -12,13 +12,17 @@
       <div class="card-body">
         <p class="mb-1"><strong>メールアドレス</strong></p>
         <p class="text-muted mb-0">{{ user.email }}</p>
+        {% if user.handle_name %}
+        <p class="mb-1 mt-3"><strong>ハンドル名</strong></p>
+        <p class="text-muted mb-0">{{ user.handle_name }}</p>
+        {% endif %}
       </div>
     </div>
 
     <div class="card mb-4">
-      <div class="card-header fw-bold">勤務先・学校名の更新</div>
+      <div class="card-header fw-bold">プロフィール設定</div>
       <div class="card-body">
-        <p class="text-muted small mb-3">レビュー投稿時に使用されます。公開されません。</p>
+        <p class="text-muted small mb-3">ハンドル名はナビバーの表示名に使用されます。勤務先は公開されません。</p>
         <form method="post">
           {% csrf_token %}
           {{ form|crispy }}

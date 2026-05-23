@@ -21,6 +21,7 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     username = None
     email = models.EmailField('メールアドレス', unique=True)
+    handle_name = models.CharField('ハンドル名', max_length=30, blank=True, help_text='サイト上での表示名（未設定の場合はメールアドレスの一部が表示されます）')
     workplace = models.CharField('勤務先・学校名', max_length=200, blank=True)
     is_hospital_admin = models.BooleanField('病院管理者', default=False)
 
