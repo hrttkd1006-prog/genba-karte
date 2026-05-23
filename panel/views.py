@@ -215,8 +215,9 @@ def job_application_action(request, pk):
 
         from django.core.mail import send_mail
         from django.conf import settings as django_settings
-        from django.contrib.auth.tokens import default_token_generator
+        from allauth.account.forms import EmailAwarePasswordResetTokenGenerator
         from allauth.account.utils import user_pk_to_url_str
+        token_generator = EmailAwarePasswordResetTokenGenerator()
 
         # アカウントが存在しなければ自動作成（is_hospital_admin=True で作成）
         user, created = User.objects.get_or_create(
@@ -247,7 +248,7 @@ def job_application_action(request, pk):
 
         # パスワード設定用URL生成（allauth形式: /accounts/password/reset/key/{uid}-{token}/）
         uid = user_pk_to_url_str(user)  # base36エンコード（allauthの形式）
-        token = default_token_generator.make_token(user)
+        token = token_generator.make_token(user)  # allauthのEmailAware形式
         setup_url = f"{django_settings.SITE_URL}/accounts/password/reset/key/{uid}-{token}/"
 
         # 承認メール送信
