@@ -6,31 +6,42 @@
     <h1 class="h4 fw-bold mb-4">プライバシーポリシー</h1>
     <div class="card">
       <div class="card-body">
-        <p class="text-muted small">最終更新日：2026年5月21日</p>
+        <p class="text-muted small">最終更新日：2026年5月24日</p>
 
         <h2 class="h6 fw-bold mt-3">収集する情報</h2>
         <ul class="small">
           <li>メールアドレス（会員登録時）</li>
           <li>勤務先・学校名（任意入力）</li>
           <li>投稿したレビュー内容</li>
-          <li>IPアドレス（不正投稿対策のみ）</li>
+          <li>IPアドレス（不正投稿・スパム対策のみ）</li>
           <li>Cookie・アクセスログ</li>
         </ul>
 
         <h2 class="h6 fw-bold mt-4">利用目的</h2>
         <ul class="small">
           <li>サービスの提供・運営</li>
+          <li>会員登録・ログイン認証およびメール確認</li>
           <li>異議申し立て対応（投稿者への確認メール送信）</li>
+          <li>お問い合わせへの回答・重要なお知らせの送信</li>
           <li>不正利用の防止</li>
           <li>サービス改善のための統計分析</li>
         </ul>
 
+        <h2 class="h6 fw-bold mt-4">第三者サービスの利用</h2>
+        <p class="small">当サービスは、メール送信にSendGrid（Twilio SendGrid）を利用しています。会員登録時のメール確認・各種通知メールはSendGrid経由で送信されます。SendGridのプライバシーポリシーは<a href="https://www.twilio.com/en-us/legal/privacy" target="_blank" rel="noopener">こちら</a>をご参照ください。</p>
+
         <h2 class="h6 fw-bold mt-4">第三者提供</h2>
-        <p class="small">法令に基づく場合を除き、ユーザーの個人情報を第三者へ提供しません。メールアドレスは異議申し立て対応以外の目的には使用しません。</p>
+        <p class="small">法令に基づく場合を除き、ユーザーの個人情報を第三者へ提供しません。メールアドレスはサービス運営上必要な通知以外の目的には使用しません。</p>
+
+        <h2 class="h6 fw-bold mt-4">データの保存期間</h2>
+        <p class="small">収集した個人情報は、退会後または最終利用日から3年を目安に削除します。ただし、法令上の保存義務がある場合はその期間に従います。</p>
 
         <h2 class="h6 fw-bold mt-4">Cookie・アクセス解析</h2>
         <p class="small">当サービスはCookieを使用してログイン状態の維持・利便性向上を行います。ブラウザ設定でCookieを無効にすることができますが、一部機能が利用できなくなる場合があります。</p>
         <p class="small">また、サービス改善のためGoogle アナリティクス（Google LLC）を使用しています。Google アナリティクスはCookieを通じてアクセス情報を収集しますが、個人を特定する情報は収集しません。収集されるデータはGoogleのプライバシーポリシーに基づき管理されます。Google アナリティクスのオプトアウトは<a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">こちら</a>から行えます。</p>
+
+        <h2 class="h6 fw-bold mt-4">個人情報に関する権利</h2>
+        <p class="small">ユーザーは、ご自身の個人情報について、開示・訂正・削除・利用停止を請求することができます。ご希望の方は<a href="{% url 'contact' %}">お問い合わせページ</a>よりご連絡ください。合理的な期間内に対応いたします。</p>
 
         <h2 class="h6 fw-bold mt-4">お問い合わせ</h2>
         <p class="small">個人情報の取り扱いに関するお問い合わせは<a href="{% url 'contact' %}">お問い合わせページ</a>よりご連絡ください。</p>
