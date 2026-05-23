@@ -9,7 +9,7 @@ from django.contrib.auth import update_session_auth_hash
 def staff_required(view_func):
     def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated or not request.user.is_staff:
-            return redirect('account_login')
+            return redirect('two_factor:login')
         if not request.user.is_verified():
             from two_factor.views import LoginView
             return redirect('two_factor:login')
