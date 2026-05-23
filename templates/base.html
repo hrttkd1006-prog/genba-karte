@@ -63,7 +63,7 @@
         {% if user.is_authenticated %}
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-              <i class="bi bi-person-circle"></i> {{ user.handle_name|default:user.email|truncatechars:20 }}
+              <i class="bi bi-person-circle"></i> {{ user.email|truncatechars:20 }}
             </a>
             <ul class="dropdown-menu dropdown-menu-end border-0 shadow" style="border-radius:12px;">
               <li><a class="dropdown-item rounded-2" href="{% url 'profile' %}"><i class="bi bi-person text-primary"></i> プロフィール</a></li>
