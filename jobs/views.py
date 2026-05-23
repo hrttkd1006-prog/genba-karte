@@ -55,6 +55,10 @@ def job_list(request):
 
 
 def for_hospitals_landing(request):
+    # ログイン済みの一般ユーザー（病院管理者・スタッフ以外）はトップへリダイレクト
+    if request.user.is_authenticated and not request.user.is_hospital_admin and not request.user.is_staff:
+        messages.info(request, 'このページは施設担当者向けのページです。')
+        return redirect('top')
     steps = [
         {'title': '申し込みフォームに入力', 'desc': '施設名・担当者名・連絡先を入力して送信してください。'},
         {'title': '運営による審査（数営業日以内）', 'desc': '内容を確認後、登録メールアドレスに審査結果をお送りします。'},
@@ -65,6 +69,10 @@ def for_hospitals_landing(request):
 
 
 def hospital_register(request):
+    # ログイン済みの一般ユーザー（病院管理者・スタッフ以外）はトップへリダイレクト
+    if request.user.is_authenticated and not request.user.is_hospital_admin and not request.user.is_staff:
+        messages.info(request, 'このページは施設担当者向けのページです。')
+        return redirect('top')
     if request.method == 'POST':
         form = HospitalRegisterForm(request.POST)
         if form.is_valid():
