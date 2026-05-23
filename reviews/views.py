@@ -208,11 +208,12 @@ def objection_reply(request, objection_id):
         reply_text = request.POST.get('reply', '').strip()
         obj.status = 'pending'
         obj.save()
+        admin_email = getattr(settings, 'ADMIN_NOTIFY_EMAIL', None) or settings.DEFAULT_FROM_EMAIL
         send_mail(
             subject=f'【げんばカルテ】異議申し立て：投稿者から返答があります（ID:{obj.pk}）',
             message=f"異議申し立てID: {obj.pk}\n施設: {review.hospital.name}\n投稿者の返答:\n{reply_text}",
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[settings.DEFAULT_FROM_EMAIL],
+            recipient_list=[admin_email],
             fail_silently=True,
         )
         return render(request, 'reviews/objection_replied.html')
