@@ -7,4 +7,4 @@ Disallow: /reviews/write/
 Disallow: /reviews/objection/
 Disallow: /reviews/objection-reply/
 
-Sitemap: https://genba-karte.jp/sitemap.xml
+Sitemap: https://genba-karte.com/sitemap.xml
