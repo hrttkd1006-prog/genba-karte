@@ -216,8 +216,7 @@ def job_application_action(request, pk):
         from django.core.mail import send_mail
         from django.conf import settings as django_settings
         from django.contrib.auth.tokens import default_token_generator
-        from django.utils.http import urlsafe_base64_encode
-        from django.utils.encoding import force_bytes
+        from allauth.account.utils import user_pk_to_url_str
 
         # アカウントが存在しなければ自動作成（is_hospital_admin=True で作成）
         user, created = User.objects.get_or_create(
@@ -247,7 +246,7 @@ def job_application_action(request, pk):
             profile.save(update_fields=['hospital'])
 
         # パスワード設定用URL生成（allauth形式: /accounts/password/reset/key/{uid}-{token}/）
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        uid = user_pk_to_url_str(user)  # base36エンコード（allauthの形式）
         token = default_token_generator.make_token(user)
         setup_url = f"{django_settings.SITE_URL}/accounts/password/reset/key/{uid}-{token}/"
 
