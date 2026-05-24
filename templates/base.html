@@ -70,8 +70,6 @@
               <li><a class="dropdown-item rounded-2" href="{% url 'favorite_list' %}"><i class="bi bi-heart-fill text-warning"></i> お気に入り</a></li>
               {% if user.is_hospital_admin %}
               <li><a class="dropdown-item rounded-2" href="{% url 'hospital_admin_dashboard' %}"><i class="bi bi-briefcase text-primary"></i> 求人管理</a></li>
-              {% else %}
-              <li><a class="dropdown-item rounded-2" href="{% url 'hospital_register' %}"><i class="bi bi-building-check text-success"></i> 施設掲載を申し込む</a></li>
               {% endif %}
               {% if user.is_staff %}
               <li><a class="dropdown-item rounded-2" href="{% url 'panel_dashboard' %}"><i class="bi bi-shield-lock text-primary"></i> 管理ダッシュボード</a></li>
