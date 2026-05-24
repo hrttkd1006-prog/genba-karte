@@ -11,9 +11,8 @@ def grant_hospital_admin_on_signup(sender, instance, created, **kwargs):
         return
 
     from jobs.models import HospitalAdminApplication, HospitalAdminProfile
-    try:
-        app = HospitalAdminApplication.objects.get(email=instance.email, status='approved')
-    except HospitalAdminApplication.DoesNotExist:
+    app = HospitalAdminApplication.objects.filter(email=instance.email, status='approved').first()
+    if not app:
         return
 
     instance.is_hospital_admin = True
