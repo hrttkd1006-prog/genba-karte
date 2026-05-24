@@ -3,6 +3,10 @@
 
 {% block title %}掲載申し込み | げんばカルテ{% endblock %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css">
+{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-lg-7">
@@ -220,17 +224,16 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  const hospitalSelect = document.getElementById('id_hospital');
+  const hospitalSelectEl = document.getElementById('id_hospital');
   const newSection = document.getElementById('new-facility-section');
   const facilityNameInput = document.getElementById('id_facility_name');
 
-  function toggleNewSection() {
-    if (!hospitalSelect || !newSection) return;
-    const selected = hospitalSelect.value;
-    if (selected) {
-      // 既存施設を選択した場合：新規入力セクションを隠す
+  function toggleNewSection(value) {
+    if (!newSection) return;
+    if (value) {
       newSection.style.display = 'none';
       if (facilityNameInput) facilityNameInput.value = '';
     } else {
@@ -238,9 +241,24 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  if (hospitalSelect) {
-    hospitalSelect.addEventListener('change', toggleNewSection);
-    toggleNewSection(); // 初期状態を反映
+  if (hospitalSelectEl) {
+    // Tom Select で検索可能なドロップダウンに変換
+    const tomSelect = new TomSelect('#id_hospital', {
+      placeholder: '施設名を入力して検索...',
+      allowEmptyOption: true,
+      maxOptions: 200,
+      onChange: function(value) {
+        toggleNewSection(value);
+        // 既存施設を選んだ場合、施設名を自動セット
+        if (value && facilityNameInput) {
+          const opt = this.options[value];
+          if (opt) facilityNameInput.value = opt.text.trim();
+        }
+      },
+    });
+
+    // 初期状態を反映
+    toggleNewSection(tomSelect.getValue());
   }
 });
 </script>
