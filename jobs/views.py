@@ -74,16 +74,7 @@ def hospital_register(request):
         messages.info(request, 'すでに病院管理者として登録されています。')
         return redirect('hospital_admin_dashboard')
 
-    # 未ログインのままページを見ている場合：セッションにnextを保存
-    # （メール確認後の自動ログイン時にアダプターがここへ戻す）
-    if not request.user.is_authenticated:
-        request.session['_next_after_login'] = request.path
-        request.session.modified = True
-
     if request.method == 'POST':
-        # 未ログインでの送信はログインへ
-        if not request.user.is_authenticated:
-            return redirect(f'/account/login/?next={request.path}')
         form = HospitalRegisterForm(request.POST)
         if form.is_valid():
             application = form.save()
@@ -96,6 +87,9 @@ def hospital_register(request):
 担当者: {application.contact_name}
 メール: {application.email}
 電話: {application.phone}
+都道府県: {application.prefecture}
+住所: {application.address}
+施設種別: {application.facility_type}
 備考: {application.message}
 
 管理パネルで審査してください:
@@ -107,9 +101,15 @@ def hospital_register(request):
             )
             return render(request, 'jobs/hospital_register_done.html', {
                 'facility_name': application.facility_name,
+                'applied_email': application.email,
+                'user_is_authenticated': request.user.is_authenticated,
             })
     else:
-        form = HospitalRegisterForm()
+        # ログイン済みの場合はメールアドレスを初期値に設定
+        initial = {}
+        if request.user.is_authenticated:
+            initial['email'] = request.user.email
+        form = HospitalRegisterForm(initial=initial)
     return render(request, 'jobs/hospital_register.html', {'form': form})
 
 

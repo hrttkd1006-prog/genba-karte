@@ -9,15 +9,35 @@
     <h1 class="h4 fw-bold mb-2">申し込みを受け付けました</h1>
     <p class="text-muted mb-4">
       <strong>{{ facility_name }}</strong> 様の掲載申し込みを受け付けました。<br>
-      運営チームが内容を確認後、数営業日以内にご登録のメールアドレスへご連絡します。
+      運営チームが内容を確認後、数営業日以内にご連絡します。
     </p>
+
+    {% if not user_is_authenticated %}
+    <!-- 未ログインの場合：会員登録を案内 -->
+    <div class="card border-primary mb-4 text-start">
+      <div class="card-body">
+        <h2 class="h6 fw-bold mb-2"><i class="bi bi-person-plus text-primary"></i> 次のステップ：会員登録</h2>
+        <p class="small text-muted mb-3">
+          承認後にダッシュボードへアクセスするため、<strong>申し込みに使ったメールアドレス（{{ applied_email }}）で会員登録</strong>をお願いします。
+        </p>
+        <a href="{% url 'account_signup' %}" class="btn btn-primary btn-sm">
+          <i class="bi bi-person-plus"></i> 無料で会員登録する
+        </a>
+        <p class="small text-muted mt-2 mb-0">
+          ※ 登録時のメールアドレスは <strong>{{ applied_email }}</strong> をご使用ください。
+        </p>
+      </div>
+    </div>
+    {% endif %}
 
     <div class="card border-0 bg-light p-4 text-start mb-4">
       <h2 class="h6 fw-bold mb-3"><i class="bi bi-list-check text-primary"></i> 承認後の流れ</h2>
       <ol class="small text-muted mb-0 ps-3">
-        <li class="mb-1">承認メールが届きます</li>
-        <li class="mb-1">メール記載のURLからアカウントを作成（申請時と同じメールアドレスで登録）</li>
-        <li class="mb-1">ダッシュボードからプランを契約</li>
+        <li class="mb-1">運営から承認メールが届きます（数営業日以内）</li>
+        {% if not user_is_authenticated %}
+        <li class="mb-1">申し込みと同じメールアドレス（{{ applied_email }}）で会員登録</li>
+        {% endif %}
+        <li class="mb-1">ダッシュボードからプランを契約（月額1,000円 / 年額10,000円・税別）</li>
         <li>求人情報を掲載開始</li>
       </ol>
     </div>
