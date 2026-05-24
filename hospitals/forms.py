@@ -31,7 +31,7 @@ class FacilityRequestForm(forms.ModelForm):
     class Meta:
         model = FacilityRequest
         fields = [
-            'facility_name', 'prefecture', 'address', 'facility_type',
+            'facility_name', 'prefecture', 'address', 'facility_type', 'official_url',
             'overall_rating',
             'salary_rating', 'relationship_rating', 'education_rating', 'equipment_rating',
             'annual_salary', 'overtime_hours', 'paid_leave_rate', 'technician_count',
@@ -45,6 +45,7 @@ class FacilityRequestForm(forms.ModelForm):
         widgets = {
             'facility_name': forms.TextInput(attrs={'placeholder': '例: 大阪大学医学部附属病院'}),
             'address': forms.TextInput(attrs={'placeholder': '例: 大阪府吹田市山田丘2-15（任意）'}),
+            'official_url': forms.URLInput(attrs={'placeholder': 'https://www.example-hospital.jp', 'class': 'form-control'}),
             'annual_salary': forms.NumberInput(attrs={'placeholder': '例: 400', 'min': 0}),
             'overtime_hours': forms.NumberInput(attrs={'placeholder': '例: 20', 'min': 0}),
             'paid_leave_rate': forms.NumberInput(attrs={'placeholder': '例: 60', 'min': 0, 'max': 100}),

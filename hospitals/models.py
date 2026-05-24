@@ -133,6 +133,7 @@ class FacilityRequest(models.Model):
     prefecture = models.CharField('都道府県', max_length=10, choices=PREFECTURE_CHOICES)
     address = models.CharField('住所', max_length=300, blank=True)
     facility_type = models.CharField('施設種別', max_length=20, choices=FACILITY_TYPE_CHOICES, default='hospital')
+    official_url = models.URLField('公式サイトURL', blank=True)
 
     # レビュー情報（任意）
     overall_rating = models.PositiveSmallIntegerField('総合評価', null=True, blank=True)

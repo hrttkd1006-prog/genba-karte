@@ -33,6 +33,12 @@
             <div class="col-sm-6">{{ form.prefecture|as_crispy_field }}</div>
             <div class="col-sm-6">{{ form.facility_type|as_crispy_field }}</div>
             <div class="col-12">{{ form.address|as_crispy_field }}</div>
+            <div class="col-12">
+              <label class="form-label fw-semibold small">公式サイトURL（任意）</label>
+              <input type="url" name="official_url" class="form-control"
+                     placeholder="https://www.example-hospital.jp"
+                     value="{{ form.official_url.value|default:'' }}">
+            </div>
           </div>
         </div>
       </div>

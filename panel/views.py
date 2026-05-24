@@ -66,6 +66,7 @@ def facility_request_action(request, pk):
             prefecture=req.prefecture,
             address=req.address or req.prefecture,
             facility_type=req.facility_type,
+            website=req.official_url or '',
         )
         if req.overall_rating and req.user:
             Review.objects.create(
