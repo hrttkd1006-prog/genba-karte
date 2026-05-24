@@ -8,9 +8,19 @@
 <div class="text-center py-5 mb-4" style="background: linear-gradient(135deg,#0d6efd,#0a58ca); color:#fff; margin: -24px -12px 32px; padding: 56px 24px !important;">
   <h1 class="h3 fw-bold mb-2">臨床検査技師に届く<br>求人掲載サービス</h1>
   <p class="mb-4 text-white-50">げんばカルテは臨床検査技師に特化した職場口コミ・求人サービスです。<br>転職を検討している現役技師に直接アプローチできます。</p>
-  <a href="{% url 'hospital_register' %}" class="btn btn-light btn-lg fw-bold px-5">
-    <i class="bi bi-building-check"></i> 掲載を申し込む（審査無料）
-  </a>
+  {% if user.is_authenticated %}
+    <a href="{% url 'hospital_register' %}" class="btn btn-light btn-lg fw-bold px-5">
+      <i class="bi bi-building-check"></i> 掲載を申し込む（審査無料）
+    </a>
+  {% else %}
+    <a href="{% url 'account_signup' %}?next={% url 'hospital_register' %}" class="btn btn-light btn-lg fw-bold px-5">
+      <i class="bi bi-building-check"></i> 会員登録して申し込む（審査無料）
+    </a>
+    <p class="mt-2 mb-0" style="font-size:.85rem; color:rgba(255,255,255,.7);">
+      すでに登録済みの方は
+      <a href="{% url 'two_factor:login' %}?next={% url 'hospital_register' %}" class="text-white fw-bold">こちらからログイン</a>
+    </p>
+  {% endif %}
 </div>
 
 <!-- 特徴 -->
@@ -58,9 +68,15 @@
 <!-- CTA -->
 <div class="text-center py-4">
   <h2 class="h5 fw-bold mb-3">まずは審査申し込みから（審査無料）</h2>
-  <a href="{% url 'hospital_register' %}" class="btn btn-primary btn-lg px-5">
-    <i class="bi bi-building-check"></i> 掲載を申し込む
-  </a>
+  {% if user.is_authenticated %}
+    <a href="{% url 'hospital_register' %}" class="btn btn-primary btn-lg px-5">
+      <i class="bi bi-building-check"></i> 掲載を申し込む
+    </a>
+  {% else %}
+    <a href="{% url 'account_signup' %}?next={% url 'hospital_register' %}" class="btn btn-primary btn-lg px-5">
+      <i class="bi bi-building-check"></i> 会員登録して申し込む
+    </a>
+  {% endif %}
   <p class="text-muted small mt-2">審査・初期費用は無料です。プラン契約は承認後に行えます。</p>
 </div>
 {% endblock %}
