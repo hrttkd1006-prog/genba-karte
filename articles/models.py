@@ -39,9 +39,9 @@ class Article(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            base = slugify(self.title, allow_unicode=True)
+            base = slugify(self.title)  # ASCII only
             if not base:
-                base = str(uuid.uuid4())[:8]
+                base = f"article-{uuid.uuid4().hex[:10]}"
             self.slug = base
             counter = 1
             while Article.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
