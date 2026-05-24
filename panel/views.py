@@ -222,14 +222,34 @@ def job_application_action(request, pk):
             user.is_hospital_admin = True
             user.save(update_fields=['is_hospital_admin'])
 
-            # 手動選択した病院を優先、なければ申請時選択、なければ施設名で部分一致
+            # 病院の紐づけ：手動選択 > 申請時選択 > 自動作成
             hospital_id = request.POST.get('hospital_id')
             if hospital_id:
                 hospital = Hospital.objects.filter(pk=hospital_id).first()
             elif app.hospital:
                 hospital = app.hospital
             else:
-                hospital = Hospital.objects.filter(name__icontains=app.facility_name).first()
+                # 申請情報から Hospital レコードを自動作成
+                from hospitals.models import Hospital as Hosp
+                import re, uuid
+                slug_base = re.sub(r'[^\w]', '-', app.facility_name.lower())[:40]
+                slug = slug_base
+                counter = 1
+                while Hosp.objects.filter(slug=slug).exists():
+                    slug = f'{slug_base}-{counter}'
+                    counter += 1
+                hospital = Hosp.objects.create(
+                    name=app.facility_name,
+                    slug=slug,
+                    prefecture=app.prefecture or '',
+                    address=app.address or '',
+                    phone=app.phone or '',
+                    facility_type=app.facility_type or 'hospital',
+                    website=app.official_url or '',
+                )
+                # 申請にも紐づけ
+                app.hospital = hospital
+                app.save(update_fields=['hospital'])
 
             # HospitalAdminProfile を作成または更新
             profile, _ = HospitalAdminProfile.objects.get_or_create(user=user)

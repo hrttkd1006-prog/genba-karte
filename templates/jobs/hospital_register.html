@@ -103,12 +103,99 @@
     <!-- 申し込みフォーム -->
     <div class="card">
       <div class="card-header fw-bold">
-        <i class="bi bi-building-check"></i> 施設情報の入力
+        <i class="bi bi-building-check"></i> 施設情報・担当者情報の入力
       </div>
       <div class="card-body">
-        <form method="post">
+        <form method="post" id="register-form">
           {% csrf_token %}
-          {{ form|crispy }}
+
+          <!-- 既存施設から選択（任意） -->
+          <div class="mb-3">
+            {{ form.hospital.label_tag }}
+            {{ form.hospital }}
+            {% if form.hospital.help_text %}<div class="form-text">{{ form.hospital.help_text }}</div>{% endif %}
+            {% for e in form.hospital.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+
+          <div id="new-facility-section">
+            <div class="border-top pt-3 mb-2">
+              <p class="small text-muted mb-2"><i class="bi bi-info-circle"></i> 一覧にない場合は以下に施設情報を入力してください</p>
+            </div>
+
+            <!-- 施設名 -->
+            <div class="mb-3">
+              {{ form.facility_name.label_tag }}
+              {{ form.facility_name }}
+              {% for e in form.facility_name.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+            </div>
+
+            <!-- 都道府県・施設種別 -->
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                {{ form.prefecture.label_tag }}
+                {{ form.prefecture }}
+                {% for e in form.prefecture.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+              <div class="col-6">
+                {{ form.facility_type.label_tag }}
+                {{ form.facility_type }}
+                {% for e in form.facility_type.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+            </div>
+
+            <!-- 住所 -->
+            <div class="mb-3">
+              {{ form.address.label_tag }}
+              {{ form.address }}
+              {% for e in form.address.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+            </div>
+          </div>
+
+          <div class="border-top pt-3 mt-3 mb-2">
+            <p class="fw-bold small mb-2"><i class="bi bi-person"></i> 担当者情報</p>
+          </div>
+
+          <!-- 担当者名・メール -->
+          <div class="mb-3">
+            {{ form.contact_name.label_tag }}
+            {{ form.contact_name }}
+            {% for e in form.contact_name.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ form.email.label_tag }}
+            {{ form.email }}
+            {% for e in form.email.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ form.phone.label_tag }}
+            {{ form.phone }}
+            {% for e in form.phone.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ form.official_url.label_tag }}
+            {{ form.official_url }}
+            {% for e in form.official_url.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ form.message.label_tag }}
+            {{ form.message }}
+            {% for e in form.message.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+
+          <!-- 利用規約同意 -->
+          <div class="mb-3 form-check">
+            {{ form.agreed_to_terms }}
+            {{ form.agreed_to_terms.label_tag }}
+            {% for e in form.agreed_to_terms.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+
+          <!-- フォーム全体エラー -->
+          {% if form.non_field_errors %}
+          <div class="alert alert-danger py-2">
+            {% for e in form.non_field_errors %}{{ e }}{% endfor %}
+          </div>
+          {% endif %}
+
           <div class="d-grid mt-4">
             <button type="submit" class="btn btn-primary btn-lg">
               <i class="bi bi-send"></i> 申し込みを送信する
@@ -130,17 +217,25 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   const hospitalSelect = document.getElementById('id_hospital');
+  const newSection = document.getElementById('new-facility-section');
   const facilityNameInput = document.getElementById('id_facility_name');
-  if (!hospitalSelect || !facilityNameInput) return;
 
-  hospitalSelect.addEventListener('change', function () {
-    const selectedOption = this.options[this.selectedIndex];
-    if (selectedOption.value) {
-      facilityNameInput.value = selectedOption.text.trim();
+  function toggleNewSection() {
+    if (!hospitalSelect || !newSection) return;
+    const selected = hospitalSelect.value;
+    if (selected) {
+      // 既存施設を選択した場合：新規入力セクションを隠す
+      newSection.style.display = 'none';
+      if (facilityNameInput) facilityNameInput.value = '';
     } else {
-      facilityNameInput.value = '';
+      newSection.style.display = '';
     }
-  });
+  }
+
+  if (hospitalSelect) {
+    hospitalSelect.addEventListener('change', toggleNewSection);
+    toggleNewSection(); // 初期状態を反映
+  }
 });
 </script>
 {% endblock %}

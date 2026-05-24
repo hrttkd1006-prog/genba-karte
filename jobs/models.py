@@ -67,6 +67,9 @@ class HospitalAdminApplication(models.Model):
         'hospitals.Hospital', on_delete=models.SET_NULL,
         null=True, blank=True, related_name='admin_applications', verbose_name='紐づけ病院'
     )
+    prefecture = models.CharField('都道府県', max_length=10, blank=True)
+    address = models.CharField('住所', max_length=300, blank=True)
+    facility_type = models.CharField('施設種別', max_length=20, blank=True)
     contact_name = models.CharField('担当者名', max_length=100)
     email = models.EmailField('メールアドレス')
     phone = models.CharField('電話番号', max_length=20)
