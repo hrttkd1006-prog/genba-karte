@@ -208,7 +208,7 @@
           <div class="d-flex align-items-center gap-2 mb-1">
             <span class="text-muted" style="width:5rem;">給与</span>
             <div class="progress flex-grow-1" style="height:6px;">
-              <div class="progress-bar bg-primary" style="width:{{ review.salary_rating|floatformat:0 }}0%"></div>
+              <div class="progress-bar bg-primary" style="width:{% widthratio review.salary_rating 5 100 %}%"></div>
             </div>
             <span class="fw-bold" style="width:1.2rem;">{{ review.salary_rating }}</span>
           </div>
@@ -217,7 +217,7 @@
           <div class="d-flex align-items-center gap-2 mb-1">
             <span class="text-muted" style="width:5rem;">人間関係</span>
             <div class="progress flex-grow-1" style="height:6px;">
-              <div class="progress-bar bg-primary" style="width:{{ review.relationship_rating|floatformat:0 }}0%"></div>
+              <div class="progress-bar bg-primary" style="width:{% widthratio review.relationship_rating 5 100 %}%"></div>
             </div>
             <span class="fw-bold" style="width:1.2rem;">{{ review.relationship_rating }}</span>
           </div>
@@ -226,7 +226,7 @@
           <div class="d-flex align-items-center gap-2 mb-1">
             <span class="text-muted" style="width:5rem;">教育体制</span>
             <div class="progress flex-grow-1" style="height:6px;">
-              <div class="progress-bar bg-primary" style="width:{{ review.education_rating|floatformat:0 }}0%"></div>
+              <div class="progress-bar bg-primary" style="width:{% widthratio review.education_rating 5 100 %}%"></div>
             </div>
             <span class="fw-bold" style="width:1.2rem;">{{ review.education_rating }}</span>
           </div>
@@ -235,7 +235,7 @@
           <div class="d-flex align-items-center gap-2">
             <span class="text-muted" style="width:5rem;">設備・機器</span>
             <div class="progress flex-grow-1" style="height:6px;">
-              <div class="progress-bar bg-primary" style="width:{{ review.equipment_rating|floatformat:0 }}0%"></div>
+              <div class="progress-bar bg-primary" style="width:{% widthratio review.equipment_rating 5 100 %}%"></div>
             </div>
             <span class="fw-bold" style="width:1.2rem;">{{ review.equipment_rating }}</span>
           </div>
