@@ -54,21 +54,6 @@ def job_list(request):
     })
 
 
-def hospital_signup_redirect(request):
-    """
-    病院管理者向け会員登録への中継ビュー。
-    next URL をセッションに保存してからsignupへ飛ぶことで、
-    メール確認後の自動ログイン時に正しくリダイレクトできるようにする。
-    """
-    if request.user.is_authenticated:
-        return redirect('hospital_register')
-    next_url = '/jobs/for-hospitals/register/'
-    request.session['_next_after_login'] = next_url
-    from django.conf import settings as _settings
-    from allauth.account.utils import get_next_redirect_url
-    signup_url = '/accounts/signup/'
-    return redirect(signup_url)
-
 
 def for_hospitals_landing(request):
     # すでに病院管理者ならダッシュボードへ
@@ -83,17 +68,26 @@ def for_hospitals_landing(request):
     return render(request, 'jobs/for_hospitals.html', {'steps': steps})
 
 
-@login_required
 def hospital_register(request):
     # すでに病院管理者ならダッシュボードへ
-    if request.user.is_hospital_admin:
+    if request.user.is_authenticated and request.user.is_hospital_admin:
         messages.info(request, 'すでに病院管理者として登録されています。')
         return redirect('hospital_admin_dashboard')
+
+    # 未ログインのままページを見ている場合：セッションにnextを保存
+    # （メール確認後の自動ログイン時にアダプターがここへ戻す）
+    if not request.user.is_authenticated:
+        request.session['_next_after_login'] = request.path
+        request.session.modified = True
+
     if request.method == 'POST':
+        # 未ログインでの送信はログインへ
+        if not request.user.is_authenticated:
+            return redirect(f'/account/login/?next={request.path}')
         form = HospitalRegisterForm(request.POST)
         if form.is_valid():
             application = form.save()
-            # 運営者にメール通知
+            admin_email = getattr(settings, 'ADMIN_NOTIFY_EMAIL', None) or settings.DEFAULT_FROM_EMAIL
             send_mail(
                 subject=f'【げんばカルテ】新しい病院掲載申請: {application.facility_name}',
                 message=f"""新しい病院掲載申請が届きました。
@@ -104,11 +98,11 @@ def hospital_register(request):
 電話: {application.phone}
 備考: {application.message}
 
-管理画面で審査してください:
-{settings.SITE_URL}/admin/jobs/hospitaladminapplication/
+管理パネルで審査してください:
+{settings.SITE_URL}/{getattr(settings, 'PANEL_URL_PREFIX', 'manage-gk2025')}/job-applications/
 """,
                 from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[settings.DEFAULT_FROM_EMAIL],
+                recipient_list=[admin_email],
                 fail_silently=True,
             )
             return render(request, 'jobs/hospital_register_done.html', {
