@@ -471,12 +471,20 @@ def change_password(request):
 def users(request):
     from accounts.models import User
     keyword = request.GET.get('keyword', '')
+    role = request.GET.get('role', '')
     items = User.objects.order_by('-date_joined')
     if keyword:
         items = items.filter(email__icontains=keyword)
+    if role == 'general':
+        items = items.filter(is_hospital_admin=False, is_staff=False)
+    elif role == 'hospital':
+        items = items.filter(is_hospital_admin=True)
+    elif role == 'staff':
+        items = items.filter(is_staff=True)
     return render(request, 'panel/users.html', {
         'items': items,
         'keyword': keyword,
+        'role': role,
     })
 
 
