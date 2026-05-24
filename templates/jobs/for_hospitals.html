@@ -9,8 +9,15 @@
   <h1 class="h3 fw-bold mb-2">臨床検査技師に届く<br>求人掲載サービス</h1>
   <p class="mb-4 text-white-50">げんばカルテは臨床検査技師に特化した職場口コミ・求人サービスです。<br>転職を検討している現役技師に直接アプローチできます。</p>
   <a href="{% url 'hospital_register' %}" class="btn btn-light btn-lg fw-bold px-5">
-    <i class="bi bi-building-check"></i> 掲載を申し込む（審査無料）
+    <i class="bi bi-building-check"></i> 施設情報を入力して申し込む（審査無料）
   </a>
+  {% if not user.is_authenticated %}
+  <div class="mt-2">
+    <a href="/account/login/?next={% url 'hospital_register' %}" style="color:rgba(255,255,255,.8); font-size:.85rem;">
+      すでに会員登録済みの方はこちら →
+    </a>
+  </div>
+  {% endif %}
 </div>
 
 <!-- 特徴 -->
@@ -58,9 +65,20 @@
 <!-- CTA -->
 <div class="text-center py-4">
   <h2 class="h5 fw-bold mb-3">まずは審査申し込みから（審査無料）</h2>
-  <a href="{% url 'hospital_register' %}" class="btn btn-primary btn-lg px-5">
-    <i class="bi bi-building-check"></i> 掲載を申し込む
-  </a>
+  {% if user.is_authenticated %}
+    <a href="{% url 'hospital_register' %}" class="btn btn-primary btn-lg px-5">
+      <i class="bi bi-building-check"></i> 施設情報を入力して申し込む
+    </a>
+  {% else %}
+    <a href="{% url 'hospital_register' %}" class="btn btn-primary btn-lg px-5">
+      <i class="bi bi-building-check"></i> 施設情報を入力して申し込む
+    </a>
+    <div class="mt-3">
+      <a href="/account/login/?next={% url 'hospital_register' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-box-arrow-in-right"></i> すでに会員登録済みの方はログインして申し込む
+      </a>
+    </div>
+  {% endif %}
   <p class="text-muted small mt-2">審査・初期費用は無料です。プラン契約は承認後に行えます。</p>
 </div>
 {% endblock %}
