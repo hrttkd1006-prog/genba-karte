@@ -1,19 +1,11 @@
 {% extends 'base.html' %}
-{% load crispy_forms_tags static %}
+{% load crispy_forms_tags %}
 
 {% block title %}ログイン | げんばカルテ{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center g-0 g-md-4 align-items-center">
-
-  <!-- バナー画像（PC のみ表示） -->
-  <div class="col-md-5 d-none d-md-block text-center">
-    <img src="{% static 'img/hero_banner.jpg' %}" alt="げんばカルテ" class="img-fluid rounded-3 shadow">
-    <p class="text-muted small mt-3">臨床検査技師の職場口コミ・求人サイト</p>
-  </div>
-
-  <!-- フォーム -->
-  <div class="col-sm-9 col-md-5">
+<div class="row justify-content-center">
+  <div class="col-sm-8 col-md-5">
     <div class="card shadow-sm">
       <div class="card-body p-4">
         <h1 class="h4 fw-bold text-center mb-4">ログイン</h1>
@@ -32,6 +24,5 @@
       </div>
     </div>
   </div>
-
 </div>
 {% endblock %}
