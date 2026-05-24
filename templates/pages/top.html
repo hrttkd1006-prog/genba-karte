@@ -27,7 +27,38 @@
         </form>
       </div>
       <div class="col-md-5 text-center d-none d-md-block">
-        <img src="{% static 'img/hero_banner.jpg' %}" alt="げんばカルテ" class="img-fluid" style="max-width:320px; border-radius:16px; filter:drop-shadow(0 8px 24px rgba(0,0,0,.2));">
+        <!-- イラスト：カルテ＋星 -->
+        <svg viewBox="0 0 280 240" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width:260px; filter:drop-shadow(0 8px 24px rgba(0,0,0,.15));">
+          <!-- 背景の装飾円 -->
+          <circle cx="140" cy="120" r="100" fill="white" fill-opacity="0.07"/>
+          <circle cx="140" cy="120" r="70"  fill="white" fill-opacity="0.07"/>
+          <!-- カルテ本体 -->
+          <rect x="70" y="28" width="140" height="180" rx="14" fill="white" fill-opacity="0.18"/>
+          <rect x="70" y="28" width="140" height="180" rx="14" stroke="white" stroke-opacity="0.5" stroke-width="1.5"/>
+          <!-- クリップ -->
+          <rect x="108" y="18" width="64" height="22" rx="8" fill="white" fill-opacity="0.3"/>
+          <rect x="125" y="14" width="30" height="12" rx="6" fill="white" fill-opacity="0.4"/>
+          <!-- テキスト行 -->
+          <rect x="90" y="68"  width="100" height="7" rx="3.5" fill="white" fill-opacity="0.35"/>
+          <rect x="90" y="84"  width="80"  height="7" rx="3.5" fill="white" fill-opacity="0.25"/>
+          <rect x="90" y="100" width="100" height="7" rx="3.5" fill="white" fill-opacity="0.35"/>
+          <rect x="90" y="116" width="60"  height="7" rx="3.5" fill="white" fill-opacity="0.25"/>
+          <!-- 星評価 -->
+          <circle cx="97"  cy="148" r="8" fill="#FCD34D"/>
+          <circle cx="117" cy="148" r="8" fill="#FCD34D"/>
+          <circle cx="137" cy="148" r="8" fill="#FCD34D"/>
+          <circle cx="157" cy="148" r="8" fill="#FCD34D"/>
+          <circle cx="177" cy="148" r="8" fill="white" fill-opacity="0.3"/>
+          <!-- 評価スコア -->
+          <rect x="90" y="165" width="50" height="7" rx="3.5" fill="white" fill-opacity="0.3"/>
+          <!-- 装飾スパークル -->
+          <path d="M42 55 L45 47 L48 55 L56 58 L48 61 L45 69 L42 61 L34 58 Z" fill="white" fill-opacity="0.5"/>
+          <path d="M232 42 L234 37 L236 42 L241 44 L236 46 L234 51 L232 46 L227 44 Z" fill="white" fill-opacity="0.4"/>
+          <path d="M245 180 L247 175 L249 180 L254 182 L249 184 L247 189 L245 184 L240 182 Z" fill="white" fill-opacity="0.35"/>
+          <circle cx="50"  cy="160" r="5" fill="white" fill-opacity="0.2"/>
+          <circle cx="240" cy="110" r="4" fill="white" fill-opacity="0.2"/>
+          <circle cx="58"  cy="100" r="3" fill="white" fill-opacity="0.15"/>
+        </svg>
       </div>
     </div>
   </div>
