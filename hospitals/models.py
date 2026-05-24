@@ -150,7 +150,7 @@ class FacilityRequest(models.Model):
     has_night_shift = models.BooleanField('夜勤あり', default=False)
     has_blood_sampling = models.BooleanField('採血行為あり', null=True, blank=True)
     work_style = models.CharField('業務スタイル', max_length=15, blank=True)
-    oncall_night_frequency = models.CharField('オンコール・夜勤の頻度', max_length=15, blank=True)
+    oncall_night_frequency = models.CharField('オンコール・当直の頻度', max_length=15, blank=True)
     male_ratio = models.PositiveSmallIntegerField('男性技師の割合（0〜10）', null=True, blank=True)
     average_age = models.PositiveSmallIntegerField('平均年齢', null=True, blank=True)
     education_system = models.CharField('教育体制', max_length=10, blank=True)
