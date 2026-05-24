@@ -54,6 +54,22 @@ def job_list(request):
     })
 
 
+def hospital_signup_redirect(request):
+    """
+    病院管理者向け会員登録への中継ビュー。
+    next URL をセッションに保存してからsignupへ飛ぶことで、
+    メール確認後の自動ログイン時に正しくリダイレクトできるようにする。
+    """
+    if request.user.is_authenticated:
+        return redirect('hospital_register')
+    next_url = '/jobs/for-hospitals/register/'
+    request.session['_next_after_login'] = next_url
+    from django.conf import settings as _settings
+    from allauth.account.utils import get_next_redirect_url
+    signup_url = '/accounts/signup/'
+    return redirect(signup_url)
+
+
 def for_hospitals_landing(request):
     # すでに病院管理者ならダッシュボードへ
     if request.user.is_authenticated and request.user.is_hospital_admin:

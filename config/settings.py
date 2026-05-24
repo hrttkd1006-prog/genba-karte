@@ -106,6 +106,8 @@ AUTHENTICATION_BACKENDS = [
 
 SITE_ID = 1
 
+ACCOUNT_ADAPTER = 'accounts.adapter.AccountAdapter'
+
 # django-allauth
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_LOGIN_METHODS = {'email'}
