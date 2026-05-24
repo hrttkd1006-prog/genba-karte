@@ -184,7 +184,6 @@
           {% if review.has_blood_sampling is not None %}<span class="bool-chip {% if review.has_blood_sampling %}yes{% else %}no{% endif %}">採血{% if review.has_blood_sampling %}あり{% else %}なし{% endif %}</span>{% endif %}
           {% if review.has_night_duty and review.night_duty_frequency %}<span class="bool-chip yes">当直頻度：{{ review.get_night_duty_frequency_display }}</span>{% endif %}
           {% if review.has_oncall and review.oncall_frequency %}<span class="bool-chip yes">オンコール頻度：{{ review.get_oncall_frequency_display }}</span>{% endif %}
-          {% if review.oncall_night_frequency and not review.night_duty_frequency and not review.oncall_frequency %}<span class="bool-chip yes">頻度：{{ review.get_oncall_night_frequency_display }}</span>{% endif %}
           {% if review.work_style %}<span class="bool-chip yes">{{ review.get_work_style_display }}</span>{% endif %}
           {% if review.education_system %}<span class="bool-chip yes">教育体制：{{ review.get_education_system_display }}</span>{% endif %}
           {% if review.equipment_age %}<span class="bool-chip yes">機器：{{ review.get_equipment_age_display }}</span>{% endif %}
