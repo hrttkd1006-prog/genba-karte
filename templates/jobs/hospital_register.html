@@ -182,8 +182,10 @@
             {% for e in form.phone.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
           </div>
           <div class="mb-3">
-            {{ form.official_url.label_tag }}
-            {{ form.official_url }}
+            <label class="form-label fw-semibold small">公式サイトURL（任意）</label>
+            <input type="url" name="official_url" class="form-control"
+                   placeholder="https://www.example-hospital.jp"
+                   value="{{ form.official_url.value|default:'' }}">
             {% for e in form.official_url.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
           </div>
           <div class="mb-3">

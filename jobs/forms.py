@@ -55,7 +55,7 @@ class HospitalRegisterForm(forms.ModelForm):
             'address': forms.TextInput(attrs={'placeholder': '例：東京都千代田区○○1-2-3'}),
             'contact_name': forms.TextInput(attrs={'placeholder': '例：山田 太郎'}),
             'email': forms.EmailInput(attrs={'placeholder': 'example@hospital.jp'}),
-            'official_url': forms.URLInput(attrs={'placeholder': 'https://www.example-hospital.jp'}),
+            'official_url': forms.URLInput(attrs={'placeholder': 'https://www.example-hospital.jp', 'class': 'form-control'}),
             'message': forms.Textarea(attrs={'rows': 3}),
         }
 
