@@ -231,13 +231,11 @@ def job_application_action(request, pk):
             else:
                 # 申請情報から Hospital レコードを自動作成
                 from hospitals.models import Hospital as Hosp
-                import re, uuid
-                slug_base = re.sub(r'[^\w]', '-', app.facility_name.lower())[:40]
-                slug = slug_base
-                counter = 1
+                import uuid
+                # 日本語施設名でも一意なスラグを生成
+                slug = f"h-{uuid.uuid4().hex[:12]}"
                 while Hosp.objects.filter(slug=slug).exists():
-                    slug = f'{slug_base}-{counter}'
-                    counter += 1
+                    slug = f"h-{uuid.uuid4().hex[:12]}"
                 hospital = Hosp.objects.create(
                     name=app.facility_name,
                     slug=slug,
