@@ -4,7 +4,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('jobs', '0003_hospitaladminapplication_official_url'),
+        ('jobs', '0004_hospitaladminapplication_hospital'),
     ]
 
     operations = [
