@@ -10,6 +10,15 @@
       <div class="card-body p-4">
         <h1 class="h4 fw-bold text-center mb-1">無料会員登録</h1>
         <p class="text-center text-muted small mb-4">メールアドレスだけで登録できます</p>
+
+        <div class="d-grid mb-3">
+          <a href="/accounts/google/login/?process=login" class="btn btn-outline-dark btn-lg">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" height="20" class="me-2" alt="Google">
+            Googleで登録・ログイン
+          </a>
+        </div>
+        <div class="text-center text-muted small mb-3">── または ──</div>
+
         <form method="post">
           {% csrf_token %}
           {{ form|crispy }}

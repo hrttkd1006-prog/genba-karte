@@ -42,6 +42,12 @@
 
         {% if wizard.steps.current == 'auth' %}
         <hr>
+        <div class="d-grid mb-3">
+          <a href="/accounts/google/login/?process=login" class="btn btn-outline-dark btn-lg">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" height="20" class="me-2" alt="Google">
+            Googleでログイン
+          </a>
+        </div>
         <p class="text-center small text-muted mb-1">
           <a href="{% url 'account_reset_password' %}">パスワードをお忘れの方</a>
         </p>
