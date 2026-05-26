@@ -16,6 +16,7 @@ def article_list(request):
 
 def article_detail(request, slug):
     article = get_object_or_404(Article, slug=slug, is_published=True)
+    Article.objects.filter(pk=article.pk).update(view_count=article.view_count + 1)
     related = Article.objects.filter(
         is_published=True, category=article.category
     ).exclude(pk=article.pk)[:3]

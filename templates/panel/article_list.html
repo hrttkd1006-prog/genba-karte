@@ -26,6 +26,7 @@
           <th>カテゴリ</th>
           <th>状態</th>
           <th>公開日</th>
+          <th>PV</th>
           <th></th>
         </tr>
       </thead>
@@ -42,6 +43,7 @@
             {% endif %}
           </td>
           <td class="small text-muted">{{ item.published_at|date:"Y/m/d"|default:"-" }}</td>
+          <td class="small fw-bold text-primary">{{ item.view_count }}</td>
           <td class="text-end">
             {% if item.is_published %}
             <a href="{% url 'article_detail' item.slug %}" target="_blank" class="btn btn-sm btn-outline-secondary me-1">

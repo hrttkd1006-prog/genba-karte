@@ -25,6 +25,7 @@ class Article(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
         null=True, related_name='articles', verbose_name='著者'
     )
+    view_count = models.PositiveIntegerField('PV数', default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     published_at = models.DateTimeField('公開日時', null=True, blank=True)
