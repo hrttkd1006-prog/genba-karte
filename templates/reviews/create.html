@@ -151,12 +151,39 @@
 
       <!-- テキスト -->
       <div class="card mb-3">
-        <div class="card-header fw-bold">口コミ本文 <span class="text-danger">*</span></div>
+        <div class="card-header fw-bold">口コミ本文</div>
         <div class="card-body">
-          {{ form.good_points|as_crispy_field }}
-          {{ form.concerns|as_crispy_field }}
-          {{ form.suitable_for|as_crispy_field }}
-          {{ form.joining_gap|as_crispy_field }}
+          <p class="text-muted small mb-3">
+            <span class="badge bg-danger">必須</span> マークがついている項目は入力必須です。
+          </p>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              <span class="badge bg-danger me-1">必須</span> 良かった点
+            </label>
+            {{ form.good_points }}
+            {% for e in form.good_points.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              <span class="badge bg-danger me-1">必須</span> 気になった点
+            </label>
+            {{ form.concerns }}
+            {% for e in form.concerns.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              <span class="badge bg-danger me-1">必須</span> どんな人に向いている職場か
+            </label>
+            {{ form.suitable_for }}
+            {% for e in form.suitable_for.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              <span class="badge bg-secondary me-1">任意</span> 入職後のギャップ
+            </label>
+            {{ form.joining_gap }}
+            {% for e in form.joining_gap.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
         </div>
       </div>
 
