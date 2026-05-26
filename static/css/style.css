@@ -289,20 +289,6 @@ body {
   flex-shrink: 0;
 }
 
-/* ── Quick nav (mobile) ─────────────────────────── */
-.quick-nav-btn {
-  background: var(--card);
-  color: var(--text);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-  transition: transform .15s, box-shadow .15s;
-}
-.quick-nav-btn:hover, .quick-nav-btn:active {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow);
-  color: var(--primary);
-}
-
 /* ── CTA block ──────────────────────────────────── */
 .cta-block {
   background: linear-gradient(135deg, #E0F7FA 0%, #E0F2F1 100%);
